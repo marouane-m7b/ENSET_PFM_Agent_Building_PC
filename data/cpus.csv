@@ -1,4 +1,3 @@
-@"
 Brand,Model,Socket,Cores,Threads,Price_MAD,Availability
 AMD,Ryzen 5 5600X,AM4,6,12,1600,In Stock
 AMD,Ryzen 7 5700X,AM4,8,16,2100,In Stock
@@ -13,4 +12,3 @@ Intel,Core i5-13400F,LGA1700,10,16,2300,In Stock
 Intel,Core i5-13600K,LGA1700,14,20,3400,In Stock
 Intel,Core i7-13700K,LGA1700,16,24,4500,In Stock
 Intel,Core i9-13900K,LGA1700,24,32,6800,Limited Stock
-"@ | Out-File -FilePath "data\cpus.csv" -Encoding UTF8
