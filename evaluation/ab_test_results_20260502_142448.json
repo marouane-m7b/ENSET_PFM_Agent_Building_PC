@@ -1,0 +1,242 @@
+{
+  "Strategy A: Basic": {
+    "average_score": 0.5424000000000001,
+    "description": "Simple, direct prompts",
+    "results": [
+      {
+        "accuracy": 0.6,
+        "response_time": 1.5,
+        "budget_adherence": 0.552,
+        "user_satisfaction": 0.5760000000000001,
+        "overall_score": 0.5760000000000001,
+        "scenario": "Budget Gaming Build",
+        "complexity": "medium"
+      },
+      {
+        "accuracy": 0.51,
+        "response_time": 2.0,
+        "budget_adherence": 0.4692,
+        "user_satisfaction": 0.48960000000000004,
+        "overall_score": 0.48960000000000004,
+        "scenario": "High-End Workstation",
+        "complexity": "high"
+      },
+      {
+        "accuracy": 0.66,
+        "response_time": 1.5,
+        "budget_adherence": 0.6072000000000001,
+        "user_satisfaction": 0.6336,
+        "overall_score": 0.6336000000000002,
+        "scenario": "Office Computer",
+        "complexity": "low"
+      },
+      {
+        "accuracy": 0.51,
+        "response_time": 2.0,
+        "budget_adherence": 0.4692,
+        "user_satisfaction": 0.48960000000000004,
+        "overall_score": 0.48960000000000004,
+        "scenario": "AI/ML Development",
+        "complexity": "high"
+      },
+      {
+        "accuracy": 0.6,
+        "response_time": 1.5,
+        "budget_adherence": 0.552,
+        "user_satisfaction": 0.5760000000000001,
+        "overall_score": 0.5760000000000001,
+        "scenario": "Streaming Setup",
+        "complexity": "medium"
+      },
+      {
+        "accuracy": 0.51,
+        "response_time": 2.0,
+        "budget_adherence": 0.4692,
+        "user_satisfaction": 0.48960000000000004,
+        "overall_score": 0.48960000000000004,
+        "scenario": "Budget Constraint",
+        "complexity": "high"
+      }
+    ]
+  },
+  "Strategy B: Detailed": {
+    "average_score": 0.6744687500000001,
+    "description": "Comprehensive analysis prompts",
+    "results": [
+      {
+        "accuracy": 0.75,
+        "response_time": 1.52,
+        "budget_adherence": 0.6825,
+        "user_satisfaction": 0.71625,
+        "overall_score": 0.71625,
+        "scenario": "Budget Gaming Build",
+        "complexity": "medium"
+      },
+      {
+        "accuracy": 0.6375,
+        "response_time": 2.02,
+        "budget_adherence": 0.580125,
+        "user_satisfaction": 0.6088125,
+        "overall_score": 0.6088125,
+        "scenario": "High-End Workstation",
+        "complexity": "high"
+      },
+      {
+        "accuracy": 0.8250000000000001,
+        "response_time": 1.52,
+        "budget_adherence": 0.7507500000000001,
+        "user_satisfaction": 0.7878750000000001,
+        "overall_score": 0.7878750000000001,
+        "scenario": "Office Computer",
+        "complexity": "low"
+      },
+      {
+        "accuracy": 0.6375,
+        "response_time": 2.02,
+        "budget_adherence": 0.580125,
+        "user_satisfaction": 0.6088125,
+        "overall_score": 0.6088125,
+        "scenario": "AI/ML Development",
+        "complexity": "high"
+      },
+      {
+        "accuracy": 0.75,
+        "response_time": 1.52,
+        "budget_adherence": 0.6825,
+        "user_satisfaction": 0.71625,
+        "overall_score": 0.71625,
+        "scenario": "Streaming Setup",
+        "complexity": "medium"
+      },
+      {
+        "accuracy": 0.6375,
+        "response_time": 2.02,
+        "budget_adherence": 0.580125,
+        "user_satisfaction": 0.6088125,
+        "overall_score": 0.6088125,
+        "scenario": "Budget Constraint",
+        "complexity": "high"
+      }
+    ]
+  },
+  "Strategy C: Structured": {
+    "average_score": 0.7643979166666667,
+    "description": "Structured output with validation",
+    "results": [
+      {
+        "accuracy": 0.85,
+        "response_time": 1.55,
+        "budget_adherence": 0.7735,
+        "user_satisfaction": 0.81175,
+        "overall_score": 0.81175,
+        "scenario": "Budget Gaming Build",
+        "complexity": "medium"
+      },
+      {
+        "accuracy": 0.7224999999999999,
+        "response_time": 2.05,
+        "budget_adherence": 0.6574749999999999,
+        "user_satisfaction": 0.6899875,
+        "overall_score": 0.6899875,
+        "scenario": "High-End Workstation",
+        "complexity": "high"
+      },
+      {
+        "accuracy": 0.935,
+        "response_time": 1.55,
+        "budget_adherence": 0.8508500000000001,
+        "user_satisfaction": 0.8929250000000001,
+        "overall_score": 0.892925,
+        "scenario": "Office Computer",
+        "complexity": "low"
+      },
+      {
+        "accuracy": 0.7224999999999999,
+        "response_time": 2.05,
+        "budget_adherence": 0.6574749999999999,
+        "user_satisfaction": 0.6899875,
+        "overall_score": 0.6899875,
+        "scenario": "AI/ML Development",
+        "complexity": "high"
+      },
+      {
+        "accuracy": 0.85,
+        "response_time": 1.55,
+        "budget_adherence": 0.7735,
+        "user_satisfaction": 0.81175,
+        "overall_score": 0.81175,
+        "scenario": "Streaming Setup",
+        "complexity": "medium"
+      },
+      {
+        "accuracy": 0.7224999999999999,
+        "response_time": 2.05,
+        "budget_adherence": 0.6574749999999999,
+        "user_satisfaction": 0.6899875,
+        "overall_score": 0.6899875,
+        "scenario": "Budget Constraint",
+        "complexity": "high"
+      }
+    ]
+  },
+  "Strategy D: Context-Aware": {
+    "average_score": 0.7646333333333334,
+    "description": "Context-rich prompts with examples",
+    "results": [
+      {
+        "accuracy": 0.8,
+        "response_time": 1.53,
+        "budget_adherence": 0.8240000000000001,
+        "user_satisfaction": 0.812,
+        "overall_score": 0.812,
+        "scenario": "Budget Gaming Build",
+        "complexity": "medium"
+      },
+      {
+        "accuracy": 0.68,
+        "response_time": 2.0300000000000002,
+        "budget_adherence": 0.7004,
+        "user_satisfaction": 0.6902,
+        "overall_score": 0.6902000000000001,
+        "scenario": "High-End Workstation",
+        "complexity": "high"
+      },
+      {
+        "accuracy": 0.8800000000000001,
+        "response_time": 1.53,
+        "budget_adherence": 0.9064000000000001,
+        "user_satisfaction": 0.8932000000000001,
+        "overall_score": 0.8932,
+        "scenario": "Office Computer",
+        "complexity": "low"
+      },
+      {
+        "accuracy": 0.68,
+        "response_time": 2.0300000000000002,
+        "budget_adherence": 0.7004,
+        "user_satisfaction": 0.6902,
+        "overall_score": 0.6902000000000001,
+        "scenario": "AI/ML Development",
+        "complexity": "high"
+      },
+      {
+        "accuracy": 0.8,
+        "response_time": 1.53,
+        "budget_adherence": 0.8240000000000001,
+        "user_satisfaction": 0.812,
+        "overall_score": 0.812,
+        "scenario": "Streaming Setup",
+        "complexity": "medium"
+      },
+      {
+        "accuracy": 0.68,
+        "response_time": 2.0300000000000002,
+        "budget_adherence": 0.7004,
+        "user_satisfaction": 0.6902,
+        "overall_score": 0.6902000000000001,
+        "scenario": "Budget Constraint",
+        "complexity": "high"
+      }
+    ]
+  }
+}

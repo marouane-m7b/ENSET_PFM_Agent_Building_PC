@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-05-02T14:24:32.320975",
+  "test_cases": 5,
+  "results": [
+    {
+      "variant_id": "arch_v1",
+      "accuracy_score": 1.0,
+      "response_time": 0.198,
+      "budget_adherence": 0.9266666666666666,
+      "component_compatibility": 0.9266666666666666,
+      "user_satisfaction": 0.9266666666666666,
+      "overall_score": 0.9266666666666666
+    },
+    {
+      "variant_id": "arch_v2",
+      "accuracy_score": 1.0,
+      "response_time": 0.124,
+      "budget_adherence": 0.8166666666666667,
+      "component_compatibility": 0.8166666666666667,
+      "user_satisfaction": 0.8166666666666667,
+      "overall_score": 0.8166666666666667
+    },
+    {
+      "variant_id": "arch_v3",
+      "accuracy_score": 1.0,
+      "response_time": 0.1,
+      "budget_adherence": 0.9266666666666666,
+      "component_compatibility": 0.9266666666666666,
+      "user_satisfaction": 0.9266666666666666,
+      "overall_score": 0.9266666666666666
+    }
+  ]
+}

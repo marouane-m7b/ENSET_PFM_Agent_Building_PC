@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-05-02T14:24:14.491716",
+  "test_cases": 5,
+  "results": [
+    {
+      "variant_id": "arch_v1",
+      "accuracy_score": 1.0,
+      "response_time": 0.11,
+      "budget_adherence": 0.9633333333333334,
+      "component_compatibility": 0.9633333333333334,
+      "user_satisfaction": 0.9633333333333334,
+      "overall_score": 0.9633333333333334
+    },
+    {
+      "variant_id": "arch_v2",
+      "accuracy_score": 1.0,
+      "response_time": 0.199,
+      "budget_adherence": 0.9633333333333334,
+      "component_compatibility": 0.9633333333333334,
+      "user_satisfaction": 0.9633333333333334,
+      "overall_score": 0.9633333333333334
+    },
+    {
+      "variant_id": "arch_v3",
+      "accuracy_score": 1.0,
+      "response_time": 0.123,
+      "budget_adherence": 0.9633333333333334,
+      "component_compatibility": 0.9633333333333334,
+      "user_satisfaction": 0.9633333333333334,
+      "overall_score": 0.9633333333333334
+    }
+  ]
+}
