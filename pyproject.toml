@@ -9,6 +9,7 @@ dependencies = [
     "langchain>=1.2.17",
     "langchain-ollama>=1.1.0",
     "langgraph>=1.1.10",
+    "pandas>=3.0.2",
     "python-dotenv>=1.2.2",
     "streamlit>=1.57.0",
 ]
