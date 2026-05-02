@@ -1,0 +1,16 @@
+@"
+Brand,Model,Socket,Cores,Threads,Price_MAD,Availability
+AMD,Ryzen 5 5600X,AM4,6,12,1600,In Stock
+AMD,Ryzen 7 5700X,AM4,8,16,2100,In Stock
+AMD,Ryzen 7 5800X3D,AM4,8,16,3500,Limited Stock
+AMD,Ryzen 5 7600X,AM5,6,12,2500,In Stock
+AMD,Ryzen 7 7700X,AM5,8,16,3800,In Stock
+AMD,Ryzen 7 7800X3D,AM5,8,16,4800,In Stock
+AMD,Ryzen 9 7900X,AM5,12,24,5200,Limited Stock
+AMD,Ryzen 9 7950X,AM5,16,32,6500,Out of Stock
+Intel,Core i5-12400F,LGA1700,6,12,1500,In Stock
+Intel,Core i5-13400F,LGA1700,10,16,2300,In Stock
+Intel,Core i5-13600K,LGA1700,14,20,3400,In Stock
+Intel,Core i7-13700K,LGA1700,16,24,4500,In Stock
+Intel,Core i9-13900K,LGA1700,24,32,6800,Limited Stock
+"@ | Out-File -FilePath "data\cpus.csv" -Encoding UTF8
