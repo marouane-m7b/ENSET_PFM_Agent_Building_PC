@@ -1,0 +1,13 @@
+﻿Brand,Model,VRAM_GB,Price_MAD,Availability
+NVIDIA,GeForce RTX 3060,12,3200,In Stock
+NVIDIA,GeForce RTX 4060,8,3500,In Stock
+NVIDIA,GeForce RTX 4060 Ti,8,4500,In Stock
+NVIDIA,GeForce RTX 4070 SUPER,12,7000,In Stock
+NVIDIA,GeForce RTX 5070 Ti,16,8500,In Stock
+NVIDIA,GeForce RTX 5080,16,12500,Limited Stock
+NVIDIA,GeForce RTX 4090,24,22000,Limited Stock
+AMD,Radeon RX 6600,8,2300,In Stock
+AMD,Radeon RX 7600,8,3200,In Stock
+AMD,Radeon RX 7700 XT,12,5200,In Stock
+AMD,Radeon RX 7800 XT,16,6200,In Stock
+AMD,Radeon RX 7900 XTX,24,11500,Limited Stock
