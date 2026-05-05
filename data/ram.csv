@@ -1,32 +1,32 @@
-Brand,Model,Type,Capacity,Speed_MHz,Sticks,Price_MAD,Availability
-Corsair,Vengeance LPX,DDR4,8GB (1x8GB),3200,1,250,In Stock
-Corsair,Vengeance LPX,DDR4,16GB (2x8GB),3200,2,450,In Stock
-Corsair,Vengeance LPX,DDR4,32GB (2x16GB),3200,2,850,In Stock
-Kingston,FURY Beast,DDR4,16GB (2x8GB),3200,2,420,In Stock
-Kingston,FURY Beast,DDR4,32GB (2x16GB),3600,2,950,In Stock
-Kingston,FURY Beast,DDR4,64GB (2x32GB),3600,2,1800,In Stock
-G.Skill,Trident Z Neo,DDR4,32GB (2x16GB),3600,2,1100,In Stock
-G.Skill,Trident Z Neo,DDR4,64GB (2x32GB),3600,2,2200,In Stock
-Corsair,Vengeance RGB Pro,DDR4,32GB (2x16GB),3200,2,1050,In Stock
-Corsair,Vengeance RGB Pro,DDR4,32GB (2x16GB),3600,2,1150,In Stock
-Crucial,Ballistix,DDR4,32GB (2x16GB),3200,2,900,In Stock
-Team,T-Force Vulcan Z,DDR4,16GB (2x8GB),3200,2,380,In Stock
-Team,T-Force Vulcan Z,DDR4,32GB (2x16GB),3200,2,750,In Stock
-HyperX,Fury,DDR4,16GB (2x8GB),3200,2,400,In Stock
-HyperX,Fury,DDR4,32GB (2x16GB),3200,2,800,In Stock
-Corsair,Vengeance,DDR5,16GB (2x8GB),4800,2,700,In Stock
-Corsair,Vengeance,DDR5,32GB (2x16GB),5600,2,1200,In Stock
-Corsair,Vengeance,DDR5,32GB (2x16GB),6000,2,1450,In Stock
-Corsair,Vengeance,DDR5,64GB (2x32GB),6000,2,2800,In Stock
-G.Skill,Trident Z5,DDR5,32GB (2x16GB),6000,2,1600,In Stock
-G.Skill,Trident Z5,DDR5,64GB (2x32GB),6000,2,3000,In Stock
-G.Skill,Trident Z5,DDR5,96GB (2x48GB),6000,2,4500,Limited Stock
-G.Skill,Trident Z5,DDR5,128GB (2x64GB),6000,2,6000,Limited Stock
-G.Skill,Flare X5,DDR5,32GB (2x16GB),6000,2,1300,In Stock
-Kingston,FURY Beast,DDR5,32GB (2x16GB),5600,2,1100,In Stock
-Kingston,FURY Beast,DDR5,64GB (2x32GB),6000,2,2500,In Stock
-Kingston,FURY Renegade,DDR5,32GB (2x16GB),6400,2,1800,In Stock
-Kingston,FURY Renegade,DDR5,64GB (2x32GB),6400,2,3500,Limited Stock
-Team,T-Force Delta,DDR5,32GB (2x16GB),6000,2,1300,In Stock
-Corsair,Dominator Platinum,DDR5,32GB (2x16GB),6200,2,2200,Limited Stock
-Corsair,Dominator Platinum,DDR5,64GB (2x32GB),6200,2,4000,Limited Stock
+Brand,Model,Type,Capacity,Speed_MHz,Sticks,Price_MAD,Availability,Stock
+Corsair,Vengeance LPX,DDR4,8GB (1x8GB),3200,1,250,In Stock,24
+Corsair,Vengeance LPX,DDR4,16GB (2x8GB),3200,2,450,In Stock,10
+Corsair,Vengeance LPX,DDR4,32GB (2x16GB),3200,2,850,In Stock,41
+Kingston,FURY Beast,DDR4,16GB (2x8GB),3200,2,420,In Stock,42
+Kingston,FURY Beast,DDR4,32GB (2x16GB),3600,2,950,In Stock,16
+Kingston,FURY Beast,DDR4,64GB (2x32GB),3600,2,1800,In Stock,33
+G.Skill,Trident Z Neo,DDR4,32GB (2x16GB),3600,2,1100,In Stock,11
+G.Skill,Trident Z Neo,DDR4,64GB (2x32GB),3600,2,2200,In Stock,44
+Corsair,Vengeance RGB Pro,DDR4,32GB (2x16GB),3200,2,1050,In Stock,50
+Corsair,Vengeance RGB Pro,DDR4,32GB (2x16GB),3600,2,1150,In Stock,11
+Crucial,Ballistix,DDR4,32GB (2x16GB),3200,2,900,In Stock,36
+Team,T-Force Vulcan Z,DDR4,16GB (2x8GB),3200,2,380,In Stock,14
+Team,T-Force Vulcan Z,DDR4,32GB (2x16GB),3200,2,750,In Stock,14
+HyperX,Fury,DDR4,16GB (2x8GB),3200,2,400,In Stock,39
+HyperX,Fury,DDR4,32GB (2x16GB),3200,2,800,In Stock,10
+Corsair,Vengeance,DDR5,16GB (2x8GB),4800,2,700,In Stock,33
+Corsair,Vengeance,DDR5,32GB (2x16GB),5600,2,1200,In Stock,32
+Corsair,Vengeance,DDR5,32GB (2x16GB),6000,2,1450,In Stock,46
+Corsair,Vengeance,DDR5,64GB (2x32GB),6000,2,2800,In Stock,11
+G.Skill,Trident Z5,DDR5,32GB (2x16GB),6000,2,1600,In Stock,44
+G.Skill,Trident Z5,DDR5,64GB (2x32GB),6000,2,3000,In Stock,6
+G.Skill,Trident Z5,DDR5,96GB (2x48GB),6000,2,4500,Limited Stock,26
+G.Skill,Trident Z5,DDR5,128GB (2x64GB),6000,2,6000,Limited Stock,46
+G.Skill,Flare X5,DDR5,32GB (2x16GB),6000,2,1300,In Stock,26
+Kingston,FURY Beast,DDR5,32GB (2x16GB),5600,2,1100,In Stock,41
+Kingston,FURY Beast,DDR5,64GB (2x32GB),6000,2,2500,In Stock,28
+Kingston,FURY Renegade,DDR5,32GB (2x16GB),6400,2,1800,In Stock,21
+Kingston,FURY Renegade,DDR5,64GB (2x32GB),6400,2,3500,Limited Stock,25
+Team,T-Force Delta,DDR5,32GB (2x16GB),6000,2,1300,In Stock,47
+Corsair,Dominator Platinum,DDR5,32GB (2x16GB),6200,2,2200,Limited Stock,16
+Corsair,Dominator Platinum,DDR5,64GB (2x32GB),6200,2,4000,Limited Stock,36

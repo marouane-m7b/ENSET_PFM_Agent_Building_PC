@@ -50,24 +50,47 @@ class ArchitectAgent:
         """
         print("🏗️ Architect Agent: Analyzing user requirements with Groq LLM...")
         request = state.get("user_request", "")
+        conversation_history = state.get("conversation_history", [])
+        previous_builds = state.get("previous_builds", [])
         
-        # Use Groq LLM to analyze the request
+        # Build context from conversation history
+        context = ""
+        if conversation_history:
+            context = "\n\nPrevious conversation:\n"
+            for msg in conversation_history[-5:]:  # Last 5 messages
+                context += f"{msg['role']}: {msg['content']}\n"
+        
+        if previous_builds:
+            last_build = previous_builds[-1]
+            context += f"\n\nPrevious build: Budget {last_build.get('budget', 0)} MAD, Total {last_build.get('total_price', 0)} MAD, Use case: {last_build.get('use_case', 'N/A')}"
+        
+        # Use Groq LLM to analyze the request WITH CONTEXT
         prompt = f"""You are a PC hardware architect. Analyze this customer request and extract:
 1. Budget (in MAD - Moroccan Dirhams)
 2. Use case (gaming, office, ai_ml, content_creation, development, or general)
 3. Performance level (basic, medium, or high)
 
-Customer Request: {request}
+IMPORTANT: If the customer refers to a previous build or says things like "less than", "cheaper than", "reduce by", etc., 
+use the context to calculate the new budget. For example:
+- "20000 less than previous" means: previous_budget - 20000
+- "reduce by 10000" means: previous_budget - 10000
+- "80000 - 20000" means: 60000 MAD budget
+{context}
+
+Current Customer Request: {request}
 
 Respond in this EXACT format:
 BUDGET: [number only]
 USE_CASE: [one word from the list above]
 PERFORMANCE: [basic, medium, or high]
+REASONING: [brief explanation of how you calculated the budget]
 """
         
         try:
             response = llm.invoke(prompt)
             analysis = response.content
+            
+            print(f"🧠 LLM Analysis:\n{analysis[:200]}...")
             
             # Parse LLM response
             budget = ArchitectAgent._parse_budget_from_llm(analysis)
@@ -89,6 +112,11 @@ PERFORMANCE: [basic, medium, or high]
             print(f"🎯 Use case identified (fallback): {use_case}")
             print(f"⚡ Performance level (fallback): {performance_level}")
         
+        # Update conversation history
+        updated_history = conversation_history + [
+            {"role": "user", "content": request}
+        ]
+        
         return {
             "architect_plan": str(budget),
             "use_case": use_case,
@@ -99,7 +127,8 @@ PERFORMANCE: [basic, medium, or high]
                 "use_case": use_case,
                 "performance_level": performance_level,
                 "original_request": request
-            }
+            },
+            "conversation_history": updated_history
         }
     
     @staticmethod
@@ -320,12 +349,17 @@ Focus on: What components should get more budget allocation? Any specific compat
             try:
                 df = pd.read_csv(file_path)
                 
-                # Filter out unavailable components
+                # Filter out unavailable components AND out of stock
                 original_count = len(df)
-                df = df[df['Availability'] != 'Out of Stock']
+                df = df[(df['Availability'] != 'Out of Stock') & (df['Stock'] > 0)]
                 available_count = len(df)
                 
-                print(f"  {component_type.upper()}: {available_count}/{original_count} available")
+                # Mark limited stock items
+                df['Stock_Status'] = df['Stock'].apply(
+                    lambda x: 'Limited Stock' if x < 10 else 'In Stock'
+                )
+                
+                print(f"  {component_type.upper()}: {available_count}/{original_count} in stock")
                 
                 databases[component_type] = df.to_dict('records')
                 
@@ -431,16 +465,18 @@ Provide 2-3 brief bullet points about expected performance. Be specific and real
             performance_notes = ProcurementAgent._generate_fallback_performance_notes(use_case)
         
         quote = "## 🖥️ **Custom PC Build Quote**\n\n"
-        quote += "| Category | Brand & Model | Price (MAD) |\n"
-        quote += "|---|---|---|\n"
+        quote += "| Category | Brand & Model | Price (MAD) | Stock |\n"
+        quote += "|---|---|---|---|\n"
         
         # Component rows
         for category, component in build.items():
-            quote += f"| **{category}** | {component['Brand']} {component['Model']} | {component['Price_MAD']:,} |\n"
+            stock_status = component.get('Stock_Status', 'In Stock')
+            stock_icon = '⚠️' if stock_status == 'Limited Stock' else '✅'
+            quote += f"| **{category}** | {component['Brand']} {component['Model']} | {component['Price_MAD']:,} | {stock_icon} {stock_status} |\n"
         
         # Total row
-        quote += "|---|---|---|\n"
-        quote += f"| **🎯 TOTAL** | **Complete System** | **{total_price:,} MAD** |\n\n"
+        quote += "|---|---|---|---|\n"
+        quote += f"| **🎯 TOTAL** | **Complete System** | **{total_price:,} MAD** | |\n\n"
         
         # Compatibility and optimization info
         quote += "### ✅ **Build Verification**\n"

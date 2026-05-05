@@ -23,6 +23,8 @@ class BuilderState(TypedDict):
     requirements_analysis: dict
     selected_components: dict
     total_price: int
+    conversation_history: List[dict]  # Add conversation memory
+    previous_builds: List[dict]  # Track previous builds in this conversation
 
 # Initialize human-in-the-loop workflow integration
 workflow_integration = initialize_workflow_integration(approval_manager)

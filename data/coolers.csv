@@ -1,30 +1,30 @@
-Brand,Model,Type,Size,Price_MAD,Availability
-Cooler Master,Hyper 212 Black Edition,Air Cooler,1x120mm,350,In Stock
-Deepcool,AK400,Air Cooler,1x120mm,400,In Stock
-ID-Cooling,SE-214-XT,Air Cooler,1x120mm,300,In Stock
-Thermalright,Assassin King 120,Air Cooler,1x120mm,320,In Stock
-Thermalright,Peerless Assassin 120 SE,Air Cooler,Dual 120mm,500,In Stock
-Deepcool,AK620,Air Cooler,Dual 120mm,650,In Stock
-Cooler Master,Hyper 622 Halo,Air Cooler,Dual 120mm,550,In Stock
-ID-Cooling,SE-226-XT,Air Cooler,Dual 120mm,480,In Stock
-Noctua,NH-U12S redux,Air Cooler,1x120mm,700,In Stock
-Noctua,NH-U14S,Air Cooler,1x140mm,900,In Stock
-Be Quiet!,Dark Rock Pro 4,Air Cooler,Dual 120/135mm,1000,In Stock
-Noctua,NH-D15 chromax.black,Air Cooler,Dual 140mm,1300,Limited Stock
-Thermalright,Phantom Spirit 120 EVO,Air Cooler,Dual 120mm,600,In Stock
-Deepcool,LS520 SE,Liquid AIO,240mm,900,In Stock
-MSI,MAG CORELIQUID 240R V2,Liquid AIO,240mm,900,In Stock
-Corsair,iCUE H100i RGB ELITE,Liquid AIO,240mm,1400,In Stock
-NZXT,Kraken 240,Liquid AIO,240mm,1600,In Stock
-Be Quiet!,Pure Loop 2 240mm,Liquid AIO,240mm,1200,In Stock
-Arctic,Liquid Freezer III 240,Liquid AIO,240mm,1000,In Stock
-Corsair,iCUE H115i RGB ELITE,Liquid AIO,280mm,1600,In Stock
-Arctic,Liquid Freezer III 280,Liquid AIO,280mm,1200,In Stock
-Deepcool,LS720 SE,Liquid AIO,360mm,1300,In Stock
-Corsair,iCUE H150i ELITE CAPELLIX XT,Liquid AIO,360mm,2500,In Stock
-NZXT,Kraken 360,Liquid AIO,360mm,2200,In Stock
-Be Quiet!,Pure Loop 2 360mm,Liquid AIO,360mm,1800,In Stock
-ASUS,ROG Ryujin III 360 ARGB,Liquid AIO,360mm,3800,Limited Stock
-Corsair,iCUE LINK H170i,Liquid AIO,420mm,3500,Limited Stock
-EK,AIO Basic 360,Liquid AIO,360mm,2800,In Stock
-Thermalright,Frozen Prism 360,Liquid AIO,360mm,1500,In Stock
+Brand,Model,Type,Size,Price_MAD,Availability,Stock
+Cooler Master,Hyper 212 Black Edition,Air Cooler,1x120mm,350,In Stock,34
+Deepcool,AK400,Air Cooler,1x120mm,400,In Stock,23
+ID-Cooling,SE-214-XT,Air Cooler,1x120mm,300,In Stock,46
+Thermalright,Assassin King 120,Air Cooler,1x120mm,320,In Stock,9
+Thermalright,Peerless Assassin 120 SE,Air Cooler,Dual 120mm,500,In Stock,33
+Deepcool,AK620,Air Cooler,Dual 120mm,650,In Stock,12
+Cooler Master,Hyper 622 Halo,Air Cooler,Dual 120mm,550,In Stock,35
+ID-Cooling,SE-226-XT,Air Cooler,Dual 120mm,480,In Stock,22
+Noctua,NH-U12S redux,Air Cooler,1x120mm,700,In Stock,28
+Noctua,NH-U14S,Air Cooler,1x140mm,900,In Stock,48
+Be Quiet!,Dark Rock Pro 4,Air Cooler,Dual 120/135mm,1000,In Stock,6
+Noctua,NH-D15 chromax.black,Air Cooler,Dual 140mm,1300,Limited Stock,14
+Thermalright,Phantom Spirit 120 EVO,Air Cooler,Dual 120mm,600,In Stock,50
+Deepcool,LS520 SE,Liquid AIO,240mm,900,In Stock,48
+MSI,MAG CORELIQUID 240R V2,Liquid AIO,240mm,900,In Stock,30
+Corsair,iCUE H100i RGB ELITE,Liquid AIO,240mm,1400,In Stock,7
+NZXT,Kraken 240,Liquid AIO,240mm,1600,In Stock,28
+Be Quiet!,Pure Loop 2 240mm,Liquid AIO,240mm,1200,In Stock,16
+Arctic,Liquid Freezer III 240,Liquid AIO,240mm,1000,In Stock,18
+Corsair,iCUE H115i RGB ELITE,Liquid AIO,280mm,1600,In Stock,37
+Arctic,Liquid Freezer III 280,Liquid AIO,280mm,1200,In Stock,40
+Deepcool,LS720 SE,Liquid AIO,360mm,1300,In Stock,9
+Corsair,iCUE H150i ELITE CAPELLIX XT,Liquid AIO,360mm,2500,In Stock,35
+NZXT,Kraken 360,Liquid AIO,360mm,2200,In Stock,34
+Be Quiet!,Pure Loop 2 360mm,Liquid AIO,360mm,1800,In Stock,47
+ASUS,ROG Ryujin III 360 ARGB,Liquid AIO,360mm,3800,Limited Stock,12
+Corsair,iCUE LINK H170i,Liquid AIO,420mm,3500,Limited Stock,32
+EK,AIO Basic 360,Liquid AIO,360mm,2800,In Stock,48
+Thermalright,Frozen Prism 360,Liquid AIO,360mm,1500,In Stock,12

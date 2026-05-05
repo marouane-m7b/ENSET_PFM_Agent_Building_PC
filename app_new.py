@@ -14,6 +14,7 @@ import json
 import requests
 from agents.graph import agent_app
 from database import db_manager
+from inventory_manager import inventory_manager
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -178,6 +179,39 @@ def handle_message(data):
     # Emit user message
     emit('message', {'role': 'user', 'content': message})
     
+    # Get conversation history from database
+    conversation_history = []
+    previous_builds = []
+    try:
+        messages = db_manager.get_chat_history(chat_id, limit=10)
+        conversation_history = [
+            {"role": msg['role'], "content": msg['content']}
+            for msg in messages
+        ]
+        
+        # Get previous builds from this chat
+        with db_manager.get_connection() as connection:
+            cursor = connection.cursor(dictionary=True, buffered=True)
+            cursor.execute("""
+                SELECT budget, total_price, use_case, performance_level, components
+                FROM pc_builds 
+                WHERE session_id = %s 
+                ORDER BY created_at DESC 
+                LIMIT 3
+            """, (chat_id,))
+            builds = cursor.fetchall()
+            cursor.close()
+            
+            for build in builds:
+                previous_builds.append({
+                    'budget': build['budget'],
+                    'total_price': build['total_price'],
+                    'use_case': build['use_case'],
+                    'performance_level': build['performance_level']
+                })
+    except Exception as e:
+        print(f"Error loading conversation history: {e}")
+    
     # Process with agent - with workflow tracking
     config = {"configurable": {"thread_id": thread_id}}
     
@@ -194,7 +228,14 @@ def handle_message(data):
         architect_done = False
         procurement_done = False
         
-        for event in agent_app.stream({"user_request": message}, config=config):
+        # Pass conversation history and previous builds to agent
+        initial_state = {
+            "user_request": message,
+            "conversation_history": conversation_history,
+            "previous_builds": previous_builds
+        }
+        
+        for event in agent_app.stream(initial_state, config=config):
             # Track architect agent
             if "architect" in event and not architect_done:
                 architect_done = True
@@ -314,6 +355,35 @@ def handle_approval(data):
             print(f"Error saving approval to database: {e}")
         
         emit('message', msg)
+        
+        # Update inventory - decrease stock for each component
+        if build_data and build_data.get('selected_components'):
+            print(f"\n📦 Updating inventory for approved build...")
+            emit('agent_status', {
+                'stage': 'inventory',
+                'status': 'processing',
+                'message': '📦 Updating inventory...'
+            })
+            
+            try:
+                components = build_data.get('selected_components', {})
+                inventory_results = inventory_manager.decrease_stock(components)
+                
+                success_count = sum(1 for v in inventory_results.values() if v)
+                total_count = len(inventory_results)
+                
+                emit('agent_status', {
+                    'stage': 'inventory',
+                    'status': 'completed',
+                    'message': f'✅ Inventory updated ({success_count}/{total_count} items)'
+                })
+            except Exception as e:
+                print(f"❌ Inventory update error: {e}")
+                emit('agent_status', {
+                    'stage': 'inventory',
+                    'status': 'error',
+                    'message': '⚠️ Inventory update failed'
+                })
         
         # Send to Discord if webhook configured
         if DISCORD_WEBHOOK_URL and build_data:
