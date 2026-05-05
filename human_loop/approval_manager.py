@@ -148,25 +148,33 @@ class ApprovalManager:
         if not build_quote or "| Category |" not in build_quote:
             validation_issues.append("Build quote is malformed or empty")
         
-        # Check for total price
-        if "Total" not in build_quote:
-            validation_issues.append("No total price found in build quote")
-        
-        # Extract total price and validate against budget
+        # Check for total price and validate against budget
         try:
+            import re
+
             lines = build_quote.split('\n')
-            total_line = [line for line in lines if 'Total' in line or 'total' in line and 'MAD' in line]
-            if total_line:
+            total_line = next(
+                (
+                    line for line in lines
+                    if re.search(r'\btotal\b', line, re.IGNORECASE) and 'MAD' in line
+                ),
+                None
+            )
+
+            if not total_line:
+                validation_issues.append("No total price found in build quote")
+            else:
                 # Extract price from total line
-                import re
-                price_match = re.search(r'(\d+)\s*MAD', total_line[0])
+                price_match = re.search(r'(\d[\d,]*)\s*MAD', total_line, re.IGNORECASE)
                 if price_match:
-                    total_price = int(price_match.group(1))
+                    total_price = int(price_match.group(1).replace(',', ''))
                     if total_price > budget * 1.1:  # Allow 10% budget overage
                         validation_issues.append(f"Build exceeds budget by {total_price - budget} MAD")
                     elif total_price < budget * 0.5:  # Flag suspiciously low builds
                         validation_issues.append(f"Build price seems unusually low ({total_price} MAD)")
-        except Exception as e:
+                else:
+                    validation_issues.append("Total price could not be parsed from build quote")
+        except Exception:
             # Don't fail validation on price extraction errors, just note it
             pass
         
@@ -193,7 +201,10 @@ class ApprovalManager:
                 "total_requests": 0,
                 "approval_rate": 0.0,
                 "rejection_rate": 0.0,
-                "average_decision_time": 0.0
+                "average_decision_time": 0.0,
+                "pending_requests": len(self.pending_requests),
+                "approved_count": 0,
+                "rejected_count": 0
             }
         
         total_requests = len(self.approval_history)

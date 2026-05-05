@@ -1,8 +1,44 @@
-﻿Brand,Model,Type,Capacity,Gen,Price_MAD,Availability
+Brand,Model,Type,Capacity,Gen,Price_MAD,Availability
+Samsung,970 EVO Plus,NVMe M.2,500GB,Gen3,550,In Stock
+Samsung,970 EVO Plus,NVMe M.2,1TB,Gen3,900,In Stock
+WD,Blue SN570,NVMe M.2,500GB,Gen3,450,In Stock
+WD,Blue SN570,NVMe M.2,1TB,Gen3,750,In Stock
+Crucial,P3,NVMe M.2,1TB,Gen3,600,In Stock
+Crucial,P3,NVMe M.2,2TB,Gen3,1100,In Stock
+Kingston,NV2,NVMe M.2,500GB,Gen3,350,In Stock
+Kingston,NV2,NVMe M.2,1TB,Gen3,550,In Stock
 Kingston,NV2,NVMe M.2,1TB,Gen4,650,In Stock
+Kingston,NV2,NVMe M.2,2TB,Gen4,1200,In Stock
 Crucial,P3 Plus,NVMe M.2,1TB,Gen4,700,In Stock
+Crucial,P3 Plus,NVMe M.2,2TB,Gen4,1300,In Stock
 Samsung,980 PRO,NVMe M.2,1TB,Gen4,1100,In Stock
+Samsung,980 PRO,NVMe M.2,2TB,Gen4,2000,In Stock
+Western Digital,WD_BLACK SN850X,NVMe M.2,1TB,Gen4,1200,In Stock
 Western Digital,WD_BLACK SN850X,NVMe M.2,2TB,Gen4,1800,In Stock
+Western Digital,WD_BLACK SN850X,NVMe M.2,4TB,Gen4,3500,Limited Stock
+Samsung,990 PRO,NVMe M.2,1TB,Gen4,1200,In Stock
 Samsung,990 PRO,NVMe M.2,2TB,Gen4,2100,In Stock
+Seagate,FireCuda 530,NVMe M.2,1TB,Gen4,1100,In Stock
+Seagate,FireCuda 530,NVMe M.2,2TB,Gen4,2000,In Stock
+Seagate,FireCuda 530,NVMe M.2,4TB,Gen4,3800,Limited Stock
+Crucial,T700,NVMe M.2,1TB,Gen5,2500,In Stock
 Crucial,T700,NVMe M.2,2TB,Gen5,3500,Limited Stock
+Seagate,FireCuda 540,NVMe M.2,2TB,Gen5,4000,Limited Stock
 Western Digital,WD Blue,HDD,2TB,SATA,600,In Stock
+Samsung,870 EVO,SATA SSD,500GB,SATA,550,In Stock
+Samsung,870 EVO,SATA SSD,1TB,SATA,1000,In Stock
+Samsung,870 EVO,SATA SSD,2TB,SATA,1900,In Stock
+Crucial,MX500,SATA SSD,500GB,SATA,450,In Stock
+Crucial,MX500,SATA SSD,1TB,SATA,850,In Stock
+Crucial,MX500,SATA SSD,2TB,SATA,1600,In Stock
+Kingston,A400,SATA SSD,240GB,SATA,250,In Stock
+Kingston,A400,SATA SSD,480GB,SATA,400,In Stock
+Seagate,Barracuda,HDD,1TB,SATA,350,In Stock
+Seagate,Barracuda,HDD,2TB,SATA,600,In Stock
+Seagate,Barracuda,HDD,4TB,SATA,1000,In Stock
+Seagate,Barracuda,HDD,8TB,SATA,1800,In Stock
+WD,Red Plus,HDD NAS,4TB,SATA,1400,In Stock
+WD,Red Plus,HDD NAS,8TB,SATA,2500,In Stock
+Seagate,IronWolf,HDD NAS,4TB,SATA,1350,In Stock
+Seagate,IronWolf,HDD NAS,8TB,SATA,2400,In Stock
+Seagate,IronWolf,HDD NAS,12TB,SATA,3800,Limited Stock
