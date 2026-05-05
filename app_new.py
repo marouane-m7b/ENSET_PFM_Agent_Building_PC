@@ -1,6 +1,7 @@
 """
-AI Hardware Architect - Modern Chat Interface
+AI Hardware Architect - Modern Chat Interface with Agentic Workflow Visualization
 Clean, minimal UI inspired by ChatGPT, Claude, and Gemini
+Enhanced with multi-agent workflow tracking and integrations
 """
 
 from flask import Flask, render_template, request, jsonify, session
@@ -9,6 +10,8 @@ import uuid
 from datetime import datetime
 import os
 import sys
+import json
+import requests
 from agents.graph import agent_app
 from database import db_manager
 
@@ -17,6 +20,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
 socketio = SocketIO(app, cors_allowed_origins="*")
+
+# Discord webhook URL (set in .env)
+DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL', '')
 
 @app.route('/')
 def index():
@@ -29,11 +35,13 @@ def new_chat():
     thread_id = str(uuid.uuid4())
     
     try:
-        if not db_manager.connection or not db_manager.connection.is_connected():
-            db_manager.connect()
-        
         user_id = db_manager.get_or_create_user(thread_id)
+        if not user_id:
+            return jsonify({'error': 'Failed to create user'}), 500
+            
         session_id = db_manager.create_chat_session(user_id, thread_id)
+        if not session_id:
+            return jsonify({'error': 'Failed to create chat session'}), 500
         
         return jsonify({
             'chat_id': session_id,
@@ -48,8 +56,8 @@ def get_chats():
     chats = []
     
     try:
-        if db_manager.connection and db_manager.connection.is_connected():
-            cursor = db_manager.connection.cursor(dictionary=True)
+        with db_manager.get_connection() as connection:
+            cursor = connection.cursor(dictionary=True, buffered=True)
             cursor.execute("""
                 SELECT cs.session_id, cs.thread_id, cs.started_at
                 FROM chat_sessions cs
@@ -62,7 +70,7 @@ def get_chats():
             
             for session in sessions:
                 # Get first message as title
-                cursor = db_manager.connection.cursor(dictionary=True)
+                cursor = connection.cursor(dictionary=True, buffered=True)
                 cursor.execute("""
                     SELECT content FROM messages 
                     WHERE session_id = %s AND role = 'user'
@@ -87,13 +95,14 @@ def get_chats():
 def get_chat(chat_id):
     """Get specific chat messages"""
     try:
-        if db_manager.connection and db_manager.connection.is_connected():
-            cursor = db_manager.connection.cursor(dictionary=True)
+        with db_manager.get_connection() as connection:
+            cursor = connection.cursor(dictionary=True, buffered=True)
             cursor.execute("""
                 SELECT thread_id, started_at FROM chat_sessions 
                 WHERE session_id = %s
             """, (chat_id,))
             session_data = cursor.fetchone()
+            cursor.close()
             
             if session_data:
                 messages = db_manager.get_chat_history(chat_id)
@@ -107,7 +116,6 @@ def get_chat(chat_id):
                     ],
                     'created_at': session_data['started_at'].isoformat()
                 })
-            cursor.close()
     except Exception as e:
         print(f"Database error: {e}")
     
@@ -117,22 +125,30 @@ def get_chat(chat_id):
 def delete_chat(chat_id):
     """Delete a chat session"""
     try:
-        if db_manager.connection and db_manager.connection.is_connected():
-            cursor = db_manager.connection.cursor()
+        with db_manager.get_connection() as connection:
+            cursor = connection.cursor(buffered=True)
             cursor.execute("DELETE FROM messages WHERE session_id = %s", (chat_id,))
             cursor.execute("DELETE FROM pc_builds WHERE session_id = %s", (chat_id,))
             cursor.execute("DELETE FROM chat_sessions WHERE session_id = %s", (chat_id,))
-            db_manager.connection.commit()
+            connection.commit()
             cursor.close()
             return jsonify({'success': True})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
-    return jsonify({'error': 'Chat not found'}), 404
 
 @socketio.on('send_message')
 def handle_message(data):
-    """Handle incoming chat messages"""
+    """Handle incoming chat messages with agent workflow tracking"""
+    chat_id = data.get('chat_id')
+    message = data.get('message')
+    
+    if not chat_id or not message:
+        emit('error', {'error': 'Invalid request'})
+        return
+    
+@socketio.on('send_message')
+def handle_message(data):
+    """Handle incoming chat messages with agent workflow tracking"""
     chat_id = data.get('chat_id')
     message = data.get('message')
     
@@ -142,8 +158,8 @@ def handle_message(data):
     
     # Get thread_id from database
     try:
-        if db_manager.connection and db_manager.connection.is_connected():
-            cursor = db_manager.connection.cursor(dictionary=True)
+        with db_manager.get_connection() as connection:
+            cursor = connection.cursor(dictionary=True, buffered=True)
             cursor.execute("SELECT thread_id FROM chat_sessions WHERE session_id = %s", (chat_id,))
             session = cursor.fetchone()
             cursor.close()
@@ -155,9 +171,6 @@ def handle_message(data):
             else:
                 emit('error', {'error': 'Chat not found'})
                 return
-        else:
-            emit('error', {'error': 'Database not connected'})
-            return
     except Exception as e:
         emit('error', {'error': f'Database error: {str(e)}'})
         return
@@ -165,19 +178,52 @@ def handle_message(data):
     # Emit user message
     emit('message', {'role': 'user', 'content': message})
     
-    # Process with agent
+    # Process with agent - with workflow tracking
     config = {"configurable": {"thread_id": thread_id}}
     
     try:
-        emit('thinking', {'status': 'processing'})
+        # Start workflow
+        emit('agent_status', {
+            'stage': 'architect',
+            'status': 'processing',
+            'message': '🏗️ Architect Agent analyzing requirements...'
+        })
         
         final_output = ""
         state_values = {}
+        architect_done = False
+        procurement_done = False
         
         for event in agent_app.stream({"user_request": message}, config=config):
-            if "procurement" in event:
+            # Track architect agent
+            if "architect" in event and not architect_done:
+                architect_done = True
+                architect_data = event["architect"]
+                emit('agent_status', {
+                    'stage': 'architect',
+                    'status': 'completed',
+                    'message': f'✅ Requirements analyzed: Budget {architect_data.get("budget", 0):,} MAD, Use case: {architect_data.get("use_case", "general")}',
+                    'data': architect_data
+                })
+                
+                # Start procurement
+                emit('agent_status', {
+                    'stage': 'procurement',
+                    'status': 'processing',
+                    'message': '🛒 Procurement Agent selecting components...'
+                })
+            
+            # Track procurement agent
+            if "procurement" in event and not procurement_done:
+                procurement_done = True
                 final_output = event["procurement"].get("final_build_quote", "")
                 state_values = event["procurement"]
+                emit('agent_status', {
+                    'stage': 'procurement',
+                    'status': 'completed',
+                    'message': f'✅ Build optimized: {state_values.get("total_price", 0):,} MAD',
+                    'data': state_values
+                })
         
         assistant_msg = {'role': 'assistant', 'content': final_output}
         
@@ -205,10 +251,16 @@ def handle_message(data):
         # Check if approval needed
         state = agent_app.get_state(config)
         if state.next and state.next[0] == "human_approval":
+            emit('agent_status', {
+                'stage': 'approval',
+                'status': 'waiting',
+                'message': '⏳ Waiting for human approval...'
+            })
             emit('approval_needed', {
                 'build_quote': final_output,
                 'user_request': message,
-                'budget': state_values.get('budget', 15000)
+                'budget': state_values.get('budget', 15000),
+                'build_data': state_values
             })
         
     except Exception as e:
@@ -216,13 +268,17 @@ def handle_message(data):
 
 @socketio.on('approve_build')
 def handle_approval(data):
-    """Handle build approval"""
+    """Handle build approval with Discord integration"""
     chat_id = data.get('chat_id')
     feedback = data.get('feedback', '')
+    build_data = data.get('build_data', {})
+    
+    print(f"🔍 Approval received - build_data keys: {build_data.keys() if build_data else 'None'}")
+    print(f"🔍 Discord webhook configured: {bool(DISCORD_WEBHOOK_URL)}")
     
     try:
-        if db_manager.connection and db_manager.connection.is_connected():
-            cursor = db_manager.connection.cursor(dictionary=True)
+        with db_manager.get_connection() as connection:
+            cursor = connection.cursor(dictionary=True, buffered=True)
             cursor.execute("SELECT thread_id FROM chat_sessions WHERE session_id = %s", (chat_id,))
             session = cursor.fetchone()
             cursor.close()
@@ -232,9 +288,6 @@ def handle_approval(data):
             else:
                 emit('error', {'error': 'Chat not found'})
                 return
-        else:
-            emit('error', {'error': 'Database not connected'})
-            return
     except Exception as e:
         emit('error', {'error': f'Database error: {str(e)}'})
         return
@@ -242,6 +295,12 @@ def handle_approval(data):
     config = {"configurable": {"thread_id": thread_id}}
     
     try:
+        emit('agent_status', {
+            'stage': 'approval',
+            'status': 'processing',
+            'message': '✅ Build approved! Finalizing...'
+        })
+        
         agent_app.update_state(config, {"human_approval": "Approved"}, as_node="human_approval")
         
         for _ in agent_app.stream(None, config=config):
@@ -256,8 +315,109 @@ def handle_approval(data):
         
         emit('message', msg)
         
+        # Send to Discord if webhook configured
+        if DISCORD_WEBHOOK_URL and build_data:
+            print(f"📤 Attempting to send to Discord...")
+            emit('agent_status', {
+                'stage': 'discord',
+                'status': 'processing',
+                'message': '📤 Sending build to Discord...'
+            })
+            try:
+                send_to_discord(build_data)
+                print(f"✅ Discord send successful!")
+                emit('discord_sent', {'success': True, 'message': '✅ Build sent to Discord channel!'})
+                emit('agent_status', {
+                    'stage': 'discord',
+                    'status': 'completed',
+                    'message': '✅ Sent to Discord!'
+                })
+            except Exception as e:
+                print(f"❌ Discord error: {e}")
+                import traceback
+                traceback.print_exc()
+                emit('discord_sent', {'success': False, 'message': f'❌ Discord error: {str(e)}'})
+                emit('agent_status', {
+                    'stage': 'discord',
+                    'status': 'error',
+                    'message': '❌ Discord failed'
+                })
+        else:
+            if not DISCORD_WEBHOOK_URL:
+                print("⚠️ Discord webhook not configured")
+            if not build_data:
+                print("⚠️ No build data provided")
+        
+        emit('agent_status', {
+            'stage': 'complete',
+            'status': 'completed',
+            'message': '🎉 Build process completed!'
+        })
+        
     except Exception as e:
+        print(f"❌ Approval error: {e}")
+        import traceback
+        traceback.print_exc()
         emit('error', {'error': str(e)})
+
+def send_to_discord(build_data):
+    """Send build to Discord channel with rich embed"""
+    if not DISCORD_WEBHOOK_URL:
+        return
+    
+    components = build_data.get('selected_components', {})
+    total_price = build_data.get('total_price', 0)
+    use_case = build_data.get('use_case', 'general')
+    budget = build_data.get('budget', 0)
+    performance_level = build_data.get('performance_level', 'medium')
+    
+    # Create Discord embed with rich formatting
+    embed = {
+        "title": "🖥️ New PC Build Approved!",
+        "description": f"A new custom PC build has been approved by a customer.",
+        "color": 0x10a37f,  # Green color
+        "fields": [
+            {
+                "name": "📊 Build Summary",
+                "value": f"**Use Case:** {use_case.replace('_', ' ').title()}\n**Performance:** {performance_level.title()}\n**Budget:** {budget:,} MAD\n**Total Cost:** {total_price:,} MAD\n**Savings:** {budget - total_price:,} MAD",
+                "inline": False
+            }
+        ],
+        "footer": {
+            "text": "AI Hardware Architect • Multi-Agent System"
+        },
+        "timestamp": datetime.now().astimezone().isoformat()
+    }
+    
+    # Add components as fields
+    component_order = ['CPU', 'GPU', 'Motherboard', 'RAM', 'Storage', 'PSU', 'Cooler', 'Case']
+    
+    for category in component_order:
+        if category in components:
+            component = components[category]
+            embed["fields"].append({
+                "name": f"**{category}**",
+                "value": f"{component.get('Brand', '')} {component.get('Model', '')}\n💰 {component.get('Price_MAD', 0):,} MAD",
+                "inline": True
+            })
+    
+    # Add budget utilization
+    utilization = (total_price / budget * 100) if budget > 0 else 0
+    embed["fields"].append({
+        "name": "📈 Budget Utilization",
+        "value": f"{utilization:.1f}% ({total_price:,} / {budget:,} MAD)",
+        "inline": False
+    })
+    
+    payload = {
+        "username": "PC Builder Bot",
+        "avatar_url": "https://cdn-icons-png.flaticon.com/512/2888/2888615.png",
+        "embeds": [embed]
+    }
+    
+    response = requests.post(DISCORD_WEBHOOK_URL, json=payload)
+    response.raise_for_status()
+    print(f"✅ Build sent to Discord successfully!")
 
 @socketio.on('reject_build')
 def handle_rejection(data):
@@ -266,8 +426,8 @@ def handle_rejection(data):
     feedback = data.get('feedback', '')
     
     try:
-        if db_manager.connection and db_manager.connection.is_connected():
-            cursor = db_manager.connection.cursor(dictionary=True)
+        with db_manager.get_connection() as connection:
+            cursor = connection.cursor(dictionary=True, buffered=True)
             cursor.execute("SELECT thread_id FROM chat_sessions WHERE session_id = %s", (chat_id,))
             session = cursor.fetchone()
             cursor.close()
@@ -277,9 +437,6 @@ def handle_rejection(data):
             else:
                 emit('error', {'error': 'Chat not found'})
                 return
-        else:
-            emit('error', {'error': 'Database not connected'})
-            return
     except Exception as e:
         emit('error', {'error': f'Database error: {str(e)}'})
         return
@@ -314,4 +471,5 @@ if __name__ == '__main__':
         print("Cannot run without database")
         exit(1)
     
-    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
+    # Run with reloader disabled to prevent connection issues
+    socketio.run(app, debug=True, host='0.0.0.0', port=5000, use_reloader=False)

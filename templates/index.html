@@ -86,6 +86,36 @@
             </div>
 
             <div class="messages-container" id="messagesContainer">
+                <!-- Agent Workflow Tracker -->
+                <div class="agent-workflow" id="agentWorkflow" style="display: none;">
+                    <div class="workflow-title">🤖 Multi-Agent Workflow</div>
+                    <div class="workflow-steps">
+                        <div class="workflow-step" id="step-architect">
+                            <div class="step-icon">🏗️</div>
+                            <div class="step-info">
+                                <div class="step-name">Architect Agent</div>
+                                <div class="step-status">Analyzing requirements...</div>
+                            </div>
+                        </div>
+                        <div class="workflow-arrow">→</div>
+                        <div class="workflow-step" id="step-procurement">
+                            <div class="step-icon">🛒</div>
+                            <div class="step-info">
+                                <div class="step-name">Procurement Agent</div>
+                                <div class="step-status">Waiting...</div>
+                            </div>
+                        </div>
+                        <div class="workflow-arrow">→</div>
+                        <div class="workflow-step" id="step-approval">
+                            <div class="step-icon">👤</div>
+                            <div class="step-info">
+                                <div class="step-name">Human Approval</div>
+                                <div class="step-status">Waiting...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="welcome-screen" id="welcomeScreen">
                     <div class="welcome-icon">💻</div>
                     <h2>AI Hardware Architect</h2>
@@ -125,6 +155,26 @@
                                 <line x1="6" y1="6" x2="18" y2="18"/>
                             </svg>
                             Reject & Revise
+                        </button>
+                    </div>
+                    <div class="approval-extras">
+                        <button class="btn-secondary" id="exportJsonBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Export JSON
+                        </button>
+                        <button class="btn-secondary" id="shareBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="18" cy="5" r="3"/>
+                                <circle cx="6" cy="12" r="3"/>
+                                <circle cx="18" cy="19" r="3"/>
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                            </svg>
+                            Share
                         </button>
                     </div>
                 </div>

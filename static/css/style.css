@@ -286,6 +286,96 @@ body {
     scroll-behavior: smooth;
 }
 
+/* Agent Workflow Tracker */
+.agent-workflow {
+    max-width: 900px;
+    margin: 0 auto 24px;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.workflow-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.workflow-steps {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.workflow-step {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background-color: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.workflow-step.processing {
+    border-color: var(--accent-color);
+    background-color: var(--bg-tertiary);
+    animation: pulse 2s infinite;
+}
+
+.workflow-step.completed {
+    border-color: var(--accent-color);
+    background-color: var(--bg-primary);
+}
+
+.workflow-step.waiting {
+    border-color: #f59e0b;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.step-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.step-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.step-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.step-status {
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.workflow-arrow {
+    font-size: 20px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
 .welcome-screen {
     display: flex;
     flex-direction: column;
@@ -421,17 +511,77 @@ body {
     margin-bottom: 8px;
 }
 
+/* Agent Workflow Status Display */
+.thinking-indicator-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 8px 0;
+}
+
+.agent-workflow-status {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.workflow-stage-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.stage-icon {
+    font-size: 20px;
+}
+
+.stage-name {
+    flex: 1;
+    color: var(--text-primary);
+}
+
+.status-icon {
+    font-size: 18px;
+}
+
+.workflow-message {
+    color: var(--text-secondary);
+    font-size: 14px;
+    padding-left: 28px;
+}
+
+.agent-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-left: 28px;
+    margin-top: 8px;
+    font-size: 13px;
+}
+
+.detail-item {
+    color: var(--text-secondary);
+    padding: 4px 8px;
+    background: var(--background);
+    border-radius: 6px;
+    border-left: 3px solid var(--primary);
+}
+
 .thinking-indicator {
     display: flex;
     gap: 4px;
     padding: 8px 0;
+    padding-left: 28px;
 }
 
 .thinking-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: var(--text-secondary);
+    background-color: var(--primary);
     animation: thinking 1.4s infinite;
 }
 
@@ -483,6 +633,35 @@ body {
 .approval-actions {
     display: flex;
     gap: 12px;
+    margin-bottom: 12px;
+}
+
+.approval-extras {
+    display: flex;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+}
+
+.btn-secondary {
+    flex: 1;
+    padding: 10px 16px;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    background-color: var(--bg-tertiary);
 }
 
 .btn {
@@ -625,5 +804,36 @@ body {
     
     .message {
         max-width: 100%;
+    }
+    
+    .workflow-steps {
+        flex-direction: column;
+    }
+    
+    .workflow-arrow {
+        transform: rotate(90deg);
+    }
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
     }
 }

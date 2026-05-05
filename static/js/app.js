@@ -24,6 +24,11 @@ const bulkActions = document.getElementById('bulkActions');
 const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
 const selectedCount = document.getElementById('selectedCount');
 const themeToggleBtn = document.getElementById('themeToggleBtn');
+const agentWorkflow = document.getElementById('agentWorkflow');
+const exportJsonBtn = document.getElementById('exportJsonBtn');
+const shareBtn = document.getElementById('shareBtn');
+
+let currentBuildData = null;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -79,6 +84,10 @@ function setupEventListeners() {
     approveBtn.addEventListener('click', () => approveBuild());
     rejectBtn.addEventListener('click', () => rejectBuild());
     
+    // Export and share buttons
+    exportJsonBtn.addEventListener('click', exportBuildJson);
+    shareBtn.addEventListener('click', shareBuild);
+    
     // Example prompts
     document.querySelectorAll('.example-prompt').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -98,18 +107,28 @@ function setupSocketListeners() {
         sendBtn.disabled = !messageInput.value.trim();
     });
     
-    socket.on('thinking', () => {
-        showThinkingIndicator();
+    socket.on('agent_status', (data) => {
+        updateThinkingIndicator(data.stage, data.status, data.message, data.data);
     });
     
     socket.on('approval_needed', (data) => {
+        currentBuildData = data.build_data;
         showApprovalModal();
+    });
+    
+    socket.on('discord_sent', (data) => {
+        if (data.success) {
+            showNotification(data.message, 'success');
+        } else {
+            showNotification(data.message, 'error');
+        }
     });
     
     socket.on('error', (data) => {
         alert('Error: ' + data.error);
         isWaitingForResponse = false;
         sendBtn.disabled = !messageInput.value.trim();
+        hideAgentWorkflow();
     });
 }
 
@@ -321,6 +340,9 @@ function sendMessage() {
     // Add user message
     addMessage('user', message);
     
+    // Show thinking indicator immediately
+    showThinkingIndicator();
+    
     // Send to server
     socket.emit('send_message', {
         chat_id: currentChatId,
@@ -367,23 +389,99 @@ function addMessage(role, content, scroll = true) {
     }
 }
 
-// Show thinking indicator
-function showThinkingIndicator() {
+// Show thinking indicator with agent details
+function showThinkingIndicator(stage = 'processing', message = 'Processing...') {
+    // Remove existing thinking indicator
+    const existing = document.querySelector('.thinking-indicator-container');
+    if (existing) {
+        existing.remove();
+    }
+    
     const thinkingDiv = document.createElement('div');
     thinkingDiv.className = 'message assistant';
     thinkingDiv.innerHTML = `
         <div class="message-avatar">🤖</div>
         <div class="message-content">
-            <div class="thinking-indicator">
-                <div class="thinking-dot"></div>
-                <div class="thinking-dot"></div>
-                <div class="thinking-dot"></div>
+            <div class="thinking-indicator-container">
+                <div class="agent-workflow-status">
+                    <div class="workflow-stage">${message}</div>
+                    <div class="thinking-indicator">
+                        <div class="thinking-dot"></div>
+                        <div class="thinking-dot"></div>
+                        <div class="thinking-dot"></div>
+                    </div>
+                </div>
             </div>
         </div>
     `;
     
     messagesContainer.appendChild(thinkingDiv);
     scrollToBottom();
+}
+
+// Update thinking indicator with agent progress
+function updateThinkingIndicator(stage, status, message, data = null) {
+    const container = document.querySelector('.thinking-indicator-container');
+    if (!container) {
+        showThinkingIndicator(stage, message);
+        return;
+    }
+    
+    const statusDiv = container.querySelector('.agent-workflow-status');
+    if (!statusDiv) return;
+    
+    // Create status icon based on stage and status
+    let icon = '⏳';
+    if (status === 'completed') icon = '✅';
+    else if (status === 'error') icon = '❌';
+    else if (status === 'processing') icon = '⚙️';
+    else if (status === 'waiting') icon = '⏸️';
+    
+    // Add stage-specific icons
+    const stageIcons = {
+        'architect': '🏗️',
+        'procurement': '🛒',
+        'approval': '👤',
+        'discord': '📤',
+        'complete': '🎉'
+    };
+    
+    const stageIcon = stageIcons[stage] || '⚙️';
+    
+    // Build detailed message with data if available
+    let detailsHTML = '';
+    if (data && status === 'completed') {
+        if (stage === 'architect') {
+            detailsHTML = `
+                <div class="agent-details">
+                    <div class="detail-item">💰 Budget: ${data.budget?.toLocaleString() || 'N/A'} MAD</div>
+                    <div class="detail-item">🎯 Use Case: ${data.use_case || 'N/A'}</div>
+                    <div class="detail-item">⚡ Performance: ${data.performance_level || 'N/A'}</div>
+                </div>
+            `;
+        } else if (stage === 'procurement') {
+            const components = data.selected_components || {};
+            const componentCount = Object.keys(components).length;
+            detailsHTML = `
+                <div class="agent-details">
+                    <div class="detail-item">🔧 Components: ${componentCount} selected</div>
+                    <div class="detail-item">💵 Total: ${data.total_price?.toLocaleString() || 'N/A'} MAD</div>
+                    <div class="detail-item">📊 Compatibility: Verified</div>
+                </div>
+            `;
+        }
+    }
+    
+    statusDiv.innerHTML = `
+        <div class="workflow-stage-header">
+            <span class="stage-icon">${stageIcon}</span>
+            <span class="stage-name">${stage.charAt(0).toUpperCase() + stage.slice(1)} Agent</span>
+            <span class="status-icon">${icon}</span>
+        </div>
+        <div class="workflow-message">${message}</div>
+        ${detailsHTML}
+        ${status === 'processing' ? '<div class="thinking-indicator"><div class="thinking-dot"></div><div class="thinking-dot"></div><div class="thinking-dot"></div></div>' : ''}
+    `;
 }
 
 // Show approval modal
@@ -400,7 +498,8 @@ function hideApprovalModal() {
 function approveBuild() {
     socket.emit('approve_build', {
         chat_id: currentChatId,
-        feedback: ''
+        feedback: '',
+        build_data: currentBuildData  // Send the build data for Discord
     });
     hideApprovalModal();
     showThinkingIndicator();
@@ -477,4 +576,100 @@ function autoResizeTextarea() {
 // Scroll to bottom
 function scrollToBottom() {
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+
+// Show approval modal
+function showApprovalModal() {
+    approvalModal.style.display = 'block';
+}
+
+// Hide approval modal
+function hideApprovalModal() {
+    approvalModal.style.display = 'none';
+}
+
+// Export build as JSON
+function exportBuildJson() {
+    if (!currentBuildData) {
+        alert('No build data available');
+        return;
+    }
+    
+    const dataStr = JSON.stringify(currentBuildData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `pc-build-${Date.now()}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    
+    showNotification('📥 Build exported as JSON', 'success');
+}
+
+// Share build
+function shareBuild() {
+    if (!currentBuildData) {
+        alert('No build data available');
+        return;
+    }
+    
+    const components = currentBuildData.selected_components || {};
+    const total = currentBuildData.total_price || 0;
+    
+    let shareText = `🖥️ My PC Build (${total.toLocaleString()} MAD)\n\n`;
+    
+    for (const [category, component] of Object.entries(components)) {
+        shareText += `${category}: ${component.Brand} ${component.Model}\n`;
+    }
+    
+    shareText += `\nBuilt with AI Hardware Architect`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'My PC Build',
+            text: shareText
+        }).then(() => {
+            showNotification('✅ Build shared!', 'success');
+        }).catch(err => {
+            copyToClipboard(shareText);
+        });
+    } else {
+        copyToClipboard(shareText);
+    }
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        showNotification('📋 Build copied to clipboard!', 'success');
+    }).catch(err => {
+        alert('Failed to copy to clipboard');
+    });
+}
+
+// Show notification
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        padding: 12px 20px;
+        background-color: ${type === 'success' ? 'var(--accent-color)' : 'var(--danger-color)'};
+        color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 1000;
+        animation: slideIn 0.3s ease;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
 }
