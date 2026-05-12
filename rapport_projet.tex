@@ -86,7 +86,7 @@ Le code source de notre projet a \'et\'e structur\'e de mani\`ere modulaire auto
     \item \textbf{LangGraph :} Utilis\'e pour concevoir l'orchestrateur (StateGraph). Il maintient l'\'etat global (BuilderState) et permet d'interrompre l'ex\'ecution via interrupt\_before.
     \item \textbf{ChromaDB et LangChain :} Utilis\'es pour la base de donn\'ees vectorielle (RAG). Nous avons vectoris\'e nos propres bases de donn\'ees CSV (inventaire de CPUs, GPUs, etc.) en utilisant des embeddings locaux.
     \item \textbf{Pandas :} Impl\'ement\'e comme m\'ecanisme de s\'ecurit\'e (Fallback). Si l'API LLM tombe en panne \`a cause des limites de requ\^etes (Rate Limits), un script Pandas d\'eterministe prend le relais pour garantir la cr\'eation du devis sans interruption.
-    \item \textbf{Streamlit :} D\'eploiement de l'interface utilisateur (UI) permettant le chat en temps r\'eel et l'apparition dynamique des boutons de validation humaine.
+    \item \textbf{Flask / SocketIO :} D\'eploiement de l'interface utilisateur (UI) permettant le chat en temps r\'eel et l'apparition dynamique des boutons de validation humaine.
 \end{itemize}
 
 \section{Architecture du Syst\`eme Multi-Agent}
@@ -126,7 +126,7 @@ Responsabilit\'es principales :
 Responsabilit\'es principales :
 \begin{itemize}
     \item Gestionnaire d'approbation avec \'etats persistants
-    \item Interface utilisateur modulaire avec composants Streamlit
+    \item Interface utilisateur modulaire avec composants Flask et SocketIO
     \item Int\'egration transparente avec LangGraph
     \item Historique et statistiques des d\'ecisions humaines
 \end{itemize}
@@ -224,7 +224,7 @@ Classe centrale g\'erant le cycle de vie des demandes d'approbation :
 \end{itemize}
 
 \subsubsection{Interface Utilisateur Modulaire (HumanApprovalUI)}
-Composants Streamlit sp\'ecialis\'es pour l'interaction humaine :
+Composants Flask/SocketIO sp\'ecialis\'es pour l'interaction humaine :
 \begin{itemize}
     \item Interface d'approbation avec boutons contextuels
     \item Comparaison requ\^ete/build c\^ote-\`a-c\^ote
@@ -315,7 +315,7 @@ Le projet est organis\'e de mani\`ere modulaire :
 
 \textbf{Dossier data/} : Bases de donn\'ees composants (CSV)
 
-\textbf{Fichier app.py} : Interface principale Streamlit
+\textbf{Fichier app.py} : Interface principale Flask
 
 \section{Conclusion et Perspectives}
 
@@ -326,7 +326,7 @@ Ce projet d\'emontre la puissance d'une architecture multi-agent modulaire et or
     \item \textbf{Orchestration Multi-Agent :} Architecture LangGraph avec agents sp\'ecialis\'es et modulaires
     \item \textbf{RAG Agentique :} Syst\`eme de r\'ecup\'eration augment\'ee avec base vectorielle ChromaDB
     \item \textbf{Human-in-the-Loop Avanc\'e :} Syst\`eme complet de validation avec interface modulaire
-    \item \textbf{Interface Web Fonctionnelle :} Application Streamlit avec chat temps r\'eel
+    \item \textbf{Interface Web Fonctionnelle :} Application Flask avec chat temps r\'eel
     \item \textbf{Evaluation des Prompts :} Framework complet avec tests A/B et optimisation
 \end{itemize}
 

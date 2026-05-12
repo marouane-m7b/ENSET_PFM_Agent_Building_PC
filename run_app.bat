@@ -15,4 +15,4 @@ echo   - Beautiful UI
 echo.
 echo Starting application...
 echo.
-uv run streamlit run app.py
+uv run python app.py

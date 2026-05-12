@@ -1,6 +1,6 @@
 # AI Hardware Architect
 
-AI Hardware Architect is a multi-agent PC builder assistant with a Streamlit interface, a Flask + SocketIO UI, RAG-backed component search, database persistence, and optional Discord notifications.
+AI Hardware Architect is a multi-agent PC builder assistant with a Flask + SocketIO UI, RAG-backed component search, database persistence, and optional Discord notifications.
 
 ## Requirements
 
@@ -30,13 +30,11 @@ AI Hardware Architect is a multi-agent PC builder assistant with a Streamlit int
 
 Use the interface you want:
 
-- Streamlit app: `uv run streamlit run app.py`
-- Flask + SocketIO app: `uv run python app_new.py`
+- Main Flask + SocketIO app: `uv run python app.py`
 
 On Windows, you can also use the helper scripts:
 
 - `run_app.bat`
-- `run_new_app.bat`
 - `setup_database.bat`
 
 ## Environment variables
