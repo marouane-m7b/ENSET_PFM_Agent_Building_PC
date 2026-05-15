@@ -137,16 +137,158 @@ def delete_chat(chat_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@socketio.on('send_message')
-def handle_message(data):
-    """Handle incoming chat messages with agent workflow tracking"""
-    chat_id = data.get('chat_id')
-    message = data.get('message')
+@app.route('/api/components/recommend', methods=['POST'])
+def recommend_components():
+    """Recommend 3 components for a given category based on build context"""
+    import pandas as pd
+    data = request.get_json()
+    category = data.get('category', '')
+    budget = data.get('budget', 15000)
+    remaining = data.get('remaining_budget', budget)
+    use_case = data.get('use_case', 'general')
+    performance = data.get('performance', 'medium')
+    selected = data.get('selected', {})
     
-    if not chat_id or not message:
-        emit('error', {'error': 'Invalid request'})
-        return
+    file_map = {
+        'cpus': 'data/cpus.csv', 'gpus': 'data/gpus.csv',
+        'motherboards': 'data/motherboards.csv', 'ram': 'data/ram.csv',
+        'storage': 'data/storage.csv', 'coolers': 'data/coolers.csv',
+        'psus': 'data/psus.csv', 'cases': 'data/cases.csv'
+    }
     
+    filepath = file_map.get(category)
+    if not filepath:
+        return jsonify({'options': [], 'error': 'Unknown category'})
+    
+    try:
+        df = pd.read_csv(filepath)
+        # Filter in-stock only
+        df = df[(df['Availability'] != 'Out of Stock') & (df['Stock'] > 0)]
+        
+        # Budget filter: component should cost at most 60% of remaining for early picks
+        steps_remaining = 8 - len(selected)
+        if steps_remaining > 1:
+            max_price = remaining * 0.6
+        else:
+            max_price = remaining
+        df = df[df['Price_MAD'] <= max_price]
+        
+        if df.empty:
+            # Fallback: just get cheapest available
+            df = pd.read_csv(filepath)
+            df = df[(df['Availability'] != 'Out of Stock') & (df['Stock'] > 0)]
+            df = df.nsmallest(3, 'Price_MAD')
+            return jsonify({'options': df.to_dict('records')})
+        
+        # Compatibility filters
+        if category == 'motherboards' and 'CPU' in selected:
+            cpu_socket = selected['CPU'].get('Socket', '')
+            df = df[df['Socket'] == cpu_socket]
+        
+        if category == 'ram' and 'CPU' in selected:
+            cpu_socket = selected['CPU'].get('Socket', '')
+            if cpu_socket == 'AM4':
+                df = df[df['Type'] == 'DDR4']
+            else:
+                df = df[df['Type'] == 'DDR5']
+        
+        if df.empty:
+            df = pd.read_csv(filepath)
+            df = df[(df['Availability'] != 'Out of Stock') & (df['Stock'] > 0)]
+            df = df.nsmallest(3, 'Price_MAD')
+            return jsonify({'options': df.to_dict('records')})
+        
+        # Sort by price and pick 3 tiers: best value, mid, premium
+        df = df.sort_values('Price_MAD')
+        n = len(df)
+        
+        if n <= 3:
+            options = df.to_dict('records')
+        else:
+            # Pick from lower third (best value), middle, upper third (premium)
+            idx_best = n // 4
+            idx_mid = n // 2
+            idx_premium = min(n - 1, int(n * 0.85))
+            options = [
+                df.iloc[idx_mid].to_dict(),   # Best match (mid)
+                df.iloc[idx_best].to_dict(),   # Best value (cheaper)
+                df.iloc[idx_premium].to_dict() # Premium
+            ]
+        
+        # Clean NaN values
+        for opt in options:
+            for k, v in opt.items():
+                if pd.isna(v):
+                    opt[k] = ''
+        
+        return jsonify({'options': options})
+    except Exception as e:
+        return jsonify({'options': [], 'error': str(e)})
+
+@app.route('/api/components/alternatives', methods=['POST'])
+def get_alternatives():
+    """Get 3 alternative components closest in price to current selection"""
+    import pandas as pd
+    data = request.get_json()
+    category = data.get('category', '')
+    current_model = data.get('current_model', '')
+    current_brand = data.get('current_brand', '')
+    current_price = data.get('current_price', 0)
+    selected = data.get('selected', {})
+    
+    file_map = {
+        'cpus': 'data/cpus.csv', 'gpus': 'data/gpus.csv',
+        'motherboards': 'data/motherboards.csv', 'ram': 'data/ram.csv',
+        'storage': 'data/storage.csv', 'coolers': 'data/coolers.csv',
+        'psus': 'data/psus.csv', 'cases': 'data/cases.csv'
+    }
+    
+    filepath = file_map.get(category)
+    if not filepath:
+        return jsonify({'options': []})
+    
+    try:
+        df = pd.read_csv(filepath)
+        df = df[(df['Availability'] != 'Out of Stock') & (df['Stock'] > 0)]
+        
+        # Exclude current component
+        df = df[~((df['Brand'] == current_brand) & (df['Model'] == current_model))]
+        
+        # Compatibility: motherboard must match CPU socket
+        if category == 'motherboards' and 'CPU' in selected:
+            cpu_socket = selected['CPU'].get('Socket', '')
+            compat = df[df['Socket'] == cpu_socket]
+            if not compat.empty:
+                df = compat
+        
+        # Compatibility: RAM must match CPU type
+        if category == 'ram' and 'CPU' in selected:
+            cpu_socket = selected['CPU'].get('Socket', '')
+            if cpu_socket == 'AM4':
+                compat = df[df['Type'] == 'DDR4']
+            else:
+                compat = df[df['Type'] == 'DDR5']
+            if not compat.empty:
+                df = compat
+        
+        if df.empty:
+            return jsonify({'options': []})
+        
+        # Sort by price distance from current
+        df['price_diff'] = (df['Price_MAD'] - current_price).abs()
+        df = df.sort_values('price_diff')
+        options = df.head(3).drop(columns=['price_diff']).to_dict('records')
+        
+        # Clean NaN
+        for opt in options:
+            for k, v in opt.items():
+                if pd.isna(v):
+                    opt[k] = ''
+        
+        return jsonify({'options': options})
+    except Exception as e:
+        return jsonify({'options': [], 'error': str(e)})
+
 @socketio.on('send_message')
 def handle_message(data):
     """Handle incoming chat messages with agent workflow tracking"""
@@ -542,4 +684,4 @@ if __name__ == '__main__':
         exit(1)
     
     # Run with reloader disabled to prevent connection issues
-    socketio.run(app, debug=True, host='0.0.0.0', port=5000, use_reloader=False)
+    socketio.run(app, debug=True, host='0.0.0.0', port=5000, use_reloader=False, allow_unsafe_werkzeug=True)

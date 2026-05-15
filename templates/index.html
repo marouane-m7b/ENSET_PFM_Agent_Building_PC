@@ -3,204 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Hardware Architect</title>
+    <title>AI Hardware Architect — Build Your Dream PC</title>
+    <meta name="description" content="Build your perfect custom PC with AI-powered multi-agent system.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <button class="new-chat-btn" id="newChatBtn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 5v14M5 12h14"/>
+    <div class="bg-particles"></div>
+
+    <!-- ===== SCREEN 1: WELCOME ===== -->
+    <div class="screen screen-welcome active" id="screenWelcome">
+        <div class="welcome-container">
+            <div class="welcome-hero">
+                <div class="hero-icon">
+                    <svg viewBox="0 0 80 80" fill="none">
+                        <rect x="8" y="16" width="64" height="48" rx="6" stroke="url(#g1)" stroke-width="3"/>
+                        <rect x="20" y="68" width="40" height="4" rx="2" fill="url(#g1)"/>
+                        <circle cx="40" cy="40" r="12" stroke="url(#g2)" stroke-width="2.5"/>
+                        <path d="M36 40l3 3 5-6" stroke="url(#g2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="g1" x1="8" y1="16" x2="72" y2="68"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>
+                            <linearGradient id="g2" x1="28" y1="28" x2="52" y2="52"><stop stop-color="#06b6d4"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>
+                        </defs>
                     </svg>
-                    New chat
+                </div>
+                <h1 class="hero-title">AI Hardware <span class="gradient-text">Architect</span></h1>
+                <p class="hero-subtitle">Choose your purpose, set your budget, and let our multi-agent AI system build the perfect PC for you.</p>
+            </div>
+
+            <div class="usecase-section">
+                <h2 class="section-label">What will you use your PC for?</h2>
+                <div class="usecase-grid">
+                    <button class="usecase-card" data-usecase="gaming"><div class="usecase-icon">🎮</div><div class="usecase-info"><h3>Gaming</h3><p>High FPS, Ray Tracing, AAA titles</p></div></button>
+                    <button class="usecase-card" data-usecase="ai_ml"><div class="usecase-icon">🧠</div><div class="usecase-info"><h3>AI / ML</h3><p>Deep Learning, Training, CUDA</p></div></button>
+                    <button class="usecase-card" data-usecase="content_creation"><div class="usecase-icon">🎬</div><div class="usecase-info"><h3>Content Creation</h3><p>Video editing, Rendering, Streaming</p></div></button>
+                    <button class="usecase-card" data-usecase="office"><div class="usecase-icon">💼</div><div class="usecase-info"><h3>Office / Work</h3><p>Productivity, Documents, Browsing</p></div></button>
+                    <button class="usecase-card" data-usecase="development"><div class="usecase-icon">💻</div><div class="usecase-info"><h3>Development</h3><p>Coding, VMs, Containers</p></div></button>
+                    <button class="usecase-card" data-usecase="general"><div class="usecase-icon">⚡</div><div class="usecase-info"><h3>General</h3><p>Balanced, All-purpose, Versatile</p></div></button>
+                </div>
+            </div>
+
+            <div class="budget-section" id="budgetSection" style="display:none;">
+                <h2 class="section-label">Set Your Budget <span class="budget-currency">(MAD)</span></h2>
+                <div class="budget-slider-container">
+                    <div class="budget-display">
+                        <input type="text" class="budget-input" id="budgetInput" value="15000" inputmode="numeric">
+                        <span class="budget-unit">MAD</span>
+                    </div>
+                    <input type="range" class="budget-slider" id="budgetSlider" min="5000" max="80000" step="1000" value="15000">
+                    <div class="budget-labels">
+                        <span>5,000</span>
+                        <span class="budget-tier" id="budgetTier">Mid-Range</span>
+                        <span>80,000</span>
+                    </div>
+                </div>
+                <div class="performance-selector">
+                    <h3 class="section-label-sm">Performance Level</h3>
+                    <div class="perf-buttons">
+                        <button class="perf-btn" data-perf="basic"><span class="perf-icon">🟢</span> Basic</button>
+                        <button class="perf-btn active" data-perf="medium"><span class="perf-icon">🟡</span> Medium</button>
+                        <button class="perf-btn" data-perf="high"><span class="perf-icon">🔴</span> High-End</button>
+                    </div>
+                </div>
+                <button class="start-build-btn" id="startBuildBtn">
+                    <span class="btn-text">🤖 Let AI Build My PC</span>
+                    <div class="btn-shine"></div>
                 </button>
-                <button class="toggle-sidebar-btn" id="toggleSidebarBtn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M15 18l-6-6 6-6"/>
-                    </svg>
-                </button>
             </div>
-            
-            <div class="chat-list-header">
-                <div class="bulk-actions" id="bulkActions" style="display: none;">
-                    <button class="bulk-delete-btn" id="bulkDeleteBtn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="3 6 5 6 21 6"/>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                        </svg>
-                        Delete <span id="selectedCount">0</span> selected
-                    </button>
-                </div>
-            </div>
-            
-            <div class="chat-list" id="chatList">
-                <!-- Chat history will be loaded here -->
-            </div>
-            
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
-                    </svg>
-                    <span>AI Hardware Architect</span>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Chat Area -->
-        <main class="main-content">
-            <div class="chat-header">
-                <button class="mobile-menu-btn" id="mobileMenuBtn">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 12h18M3 6h18M3 18h18"/>
-                    </svg>
-                </button>
-                <h1 class="chat-title" id="chatTitle">AI Hardware Architect</h1>
-                <div class="header-actions">
-                    <button class="icon-btn theme-toggle-btn" id="themeToggleBtn" title="Toggle theme">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="5"/>
-                            <line x1="12" y1="1" x2="12" y2="3"/>
-                            <line x1="12" y1="21" x2="12" y2="23"/>
-                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                            <line x1="1" y1="12" x2="3" y2="12"/>
-                            <line x1="21" y1="12" x2="23" y2="12"/>
-                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-                        </svg>
-                    </button>
-                    <button class="icon-btn" id="deleteChatBtn" title="Delete chat">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="3 6 5 6 21 6"/>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-
-            <div class="messages-container" id="messagesContainer">
-                <!-- Agent Workflow Tracker -->
-                <div class="agent-workflow" id="agentWorkflow" style="display: none;">
-                    <div class="workflow-title">🤖 Multi-Agent Workflow</div>
-                    <div class="workflow-steps">
-                        <div class="workflow-step" id="step-architect">
-                            <div class="step-icon">🏗️</div>
-                            <div class="step-info">
-                                <div class="step-name">Architect Agent</div>
-                                <div class="step-status">Analyzing requirements...</div>
-                            </div>
-                        </div>
-                        <div class="workflow-arrow">→</div>
-                        <div class="workflow-step" id="step-procurement">
-                            <div class="step-icon">🛒</div>
-                            <div class="step-info">
-                                <div class="step-name">Procurement Agent</div>
-                                <div class="step-status">Waiting...</div>
-                            </div>
-                        </div>
-                        <div class="workflow-arrow">→</div>
-                        <div class="workflow-step" id="step-approval">
-                            <div class="step-icon">👤</div>
-                            <div class="step-info">
-                                <div class="step-name">Human Approval</div>
-                                <div class="step-status">Waiting...</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="welcome-screen" id="welcomeScreen">
-                    <div class="welcome-icon">💻</div>
-                    <h2>AI Hardware Architect</h2>
-                    <p>Build your perfect PC with AI assistance</p>
-                    <div class="example-prompts">
-                        <button class="example-prompt" data-prompt="Build me a gaming PC for 15000 MAD">
-                            🎮 Gaming PC for 15000 MAD
-                        </button>
-                        <button class="example-prompt" data-prompt="I need a workstation for AI/ML under 20000 MAD">
-                            🤖 AI/ML Workstation
-                        </button>
-                        <button class="example-prompt" data-prompt="Budget office PC for 8000 MAD">
-                            💼 Office PC
-                        </button>
-                        <button class="example-prompt" data-prompt="High-end content creation build 25000 MAD">
-                            🎬 Content Creation
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Approval Modal -->
-            <div class="approval-modal" id="approvalModal" style="display: none;">
-                <div class="approval-content">
-                    <h3>🔍 Review Build</h3>
-                    <p>Please review the proposed build and provide your decision:</p>
-                    <div class="approval-actions">
-                        <button class="btn btn-approve" id="approveBtn">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20 6 9 17 4 12"/>
-                            </svg>
-                            Approve Build
-                        </button>
-                        <button class="btn btn-reject" id="rejectBtn">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="18" y1="6" x2="6" y2="18"/>
-                                <line x1="6" y1="6" x2="18" y2="18"/>
-                            </svg>
-                            Reject & Revise
-                        </button>
-                    </div>
-                    <div class="approval-extras">
-                        <button class="btn-secondary" id="exportJsonBtn">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                <polyline points="7 10 12 15 17 10"/>
-                                <line x1="12" y1="15" x2="12" y2="3"/>
-                            </svg>
-                            Export JSON
-                        </button>
-                        <button class="btn-secondary" id="shareBtn">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="18" cy="5" r="3"/>
-                                <circle cx="6" cy="12" r="3"/>
-                                <circle cx="18" cy="19" r="3"/>
-                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-                            </svg>
-                            Share
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="input-container">
-                <div class="input-wrapper">
-                    <textarea 
-                        id="messageInput" 
-                        placeholder="Message AI Hardware Architect..." 
-                        rows="1"
-                    ></textarea>
-                    <button class="send-btn" id="sendBtn" disabled>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="22" y1="2" x2="11" y2="13"/>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="input-footer">
-                    AI can make mistakes. Please verify important information.
-                </div>
-            </div>
-        </main>
+        </div>
     </div>
 
+    <!-- ===== SCREEN 2: AI BUILDING (Agent Workflow) ===== -->
+    <div class="screen screen-building" id="screenBuilding">
+        <div class="building-container">
+            <div class="building-header">
+                <div class="building-icon-wrap"><div class="building-pulse"></div>🤖</div>
+                <h1 class="building-title">AI is Building Your PC</h1>
+                <p class="building-sub">Our multi-agent system is analyzing requirements and selecting optimal components...</p>
+            </div>
+            <div class="workflow-nodes">
+                <div class="wf-node" id="wfArchitect">
+                    <div class="wf-node-icon">🏗️</div>
+                    <div class="wf-node-label">Architect Agent</div>
+                    <div class="wf-node-status" id="wfArchitectStatus">Waiting...</div>
+                    <div class="wf-node-detail" id="wfArchitectDetail"></div>
+                </div>
+                <div class="wf-connector" id="wfConn1"></div>
+                <div class="wf-node" id="wfProcurement">
+                    <div class="wf-node-icon">🛒</div>
+                    <div class="wf-node-label">Procurement Agent</div>
+                    <div class="wf-node-status" id="wfProcurementStatus">Waiting...</div>
+                    <div class="wf-node-detail" id="wfProcurementDetail"></div>
+                </div>
+                <div class="wf-connector" id="wfConn2"></div>
+                <div class="wf-node" id="wfApproval">
+                    <div class="wf-node-icon">👤</div>
+                    <div class="wf-node-label">Your Approval</div>
+                    <div class="wf-node-status" id="wfApprovalStatus">Waiting...</div>
+                </div>
+            </div>
+            <div class="building-loader">
+                <div class="loader-bar"><div class="loader-fill" id="loaderFill"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCREEN 3: BUILD SUMMARY (Approve/Reject) ===== -->
+    <div class="screen screen-summary" id="screenSummary">
+        <div class="summary-container">
+            <div class="summary-header">
+                <div class="summary-icon">🖥️</div>
+                <h1 class="summary-title">Your AI-Built PC</h1>
+                <p class="summary-subtitle">Review the build our AI agents selected for you</p>
+            </div>
+
+            <div class="build-components" id="buildComponents"></div>
+
+            <div class="build-stats">
+                <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-label">Total Cost</div><div class="stat-value" id="totalCost">0</div></div>
+                <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-label">Budget Used</div><div class="stat-value" id="budgetUsed">0%</div></div>
+                <div class="stat-card"><div class="stat-icon">💵</div><div class="stat-label">Savings</div><div class="stat-value" id="budgetRemaining">0</div></div>
+                <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-label">Compatibility</div><div class="stat-value stat-compat">Verified</div></div>
+            </div>
+
+            <div class="summary-actions">
+                <button class="action-btn action-reject" id="rejectBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    Modify Build
+                </button>
+                <button class="action-btn action-approve" id="approveBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                    Approve & Send to Discord
+                    <div class="btn-shine"></div>
+                </button>
+            </div>
+
+            <div class="summary-extras">
+                <button class="extra-btn" id="exportBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export JSON</button>
+                <button class="extra-btn" id="shareExportBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCREEN 4: MODIFY BUILD (Swap Components) ===== -->
+    <div class="screen screen-modify" id="screenModify">
+        <div class="modify-container">
+            <div class="modify-header">
+                <button class="back-btn" id="modifyBackBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </button>
+                <div>
+                    <h1 class="modify-title">Modify Your Build</h1>
+                    <p class="modify-sub">Click any component to see 3 alternatives at similar price</p>
+                </div>
+            </div>
+
+            <div class="modify-components" id="modifyComponents"></div>
+
+            <!-- Alternatives Panel (shown when clicking a component) -->
+            <div class="alternatives-panel" id="alternativesPanel" style="display:none;">
+                <div class="alt-header">
+                    <h3 id="altTitle">Alternatives for CPU</h3>
+                    <button class="alt-close" id="altClose">✕</button>
+                </div>
+                <div class="alt-cards" id="altCards"></div>
+            </div>
+
+            <div class="modify-actions">
+                <button class="action-btn action-approve" id="modifyApproveBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                    Approve Modified Build
+                    <div class="btn-shine"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCREEN 5: RESULT ===== -->
+    <div class="screen screen-result" id="screenResult">
+        <div class="result-container">
+            <div class="result-icon" id="resultIcon">🎉</div>
+            <h1 class="result-title" id="resultTitle">Build Approved!</h1>
+            <p class="result-message" id="resultMessage">Your PC build has been sent to Discord and inventory updated.</p>
+            <div class="result-actions">
+                <button class="action-btn action-approve" id="resultNewBuild">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                    Start New Build
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification-container" id="notificationContainer"></div>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>

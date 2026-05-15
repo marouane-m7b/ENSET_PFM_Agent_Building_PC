@@ -88,10 +88,13 @@ Pour ce projet de fin de module, nous avons choisi de d\'evelopper un \textbf{Ar
 \section{D\'etails d'Impl\'ementation (Technologies Utilis\'ees)}
 Le code source de notre projet a \'et\'e structur\'e de mani\`ere modulaire autour des technologies de pointe de l'\'ecosyst\`eme IA :
 \begin{itemize}
-    \item \textbf{LangGraph :} Utilis\'e pour concevoir l'orchestrateur (StateGraph). Il maintient l'\'etat global (BuilderState) et permet d'interrompre l'ex\'ecution via interrupt\_before.
-    \item \textbf{ChromaDB et LangChain :} Utilis\'es pour la base de donn\'ees vectorielle (RAG). Nous avons vectoris\'e nos propres bases de donn\'ees CSV (inventaire de CPUs, GPUs, etc.) en utilisant des embeddings locaux.
-    \item \textbf{Pandas :} Impl\'ement\'e comme m\'ecanisme de s\'ecurit\'e (Fallback). Si l'API LLM tombe en panne \`a cause des limites de requ\^etes (Rate Limits), un script Pandas d\'eterministe prend le relais pour garantir la cr\'eation du devis sans interruption.
-    \item \textbf{Flask / SocketIO :} D\'eploiement de l'interface utilisateur (UI) permettant le chat en temps r\'eel et l'apparition dynamique des boutons de validation humaine.
+    \item \textbf{LangGraph :} Utilis\'e pour concevoir l'orchestrateur (StateGraph). Il maintient l'\'etat global (BuilderState) et permet d'interrompre l'ex\'ecution via interrupt\_before pour le Human-in-the-Loop.
+    \item \textbf{Groq API (LLaMA 3.3 70B) :} Mod\`ele de langage utilis\'e pour l'analyse s\'emantique des requ\^etes (Agent Architecte) et la strat\'egie de s\'election (Agent Procurement). Choisi pour sa rapidit\'e d'inf\'erence.
+    \item \textbf{ChromaDB + nomic-embed-text :} Base de donn\'ees vectorielle (RAG) aliment\'ee par les embeddings locaux d'Ollama. Nos 8 fichiers CSV d'inventaire (CPUs, GPUs, RAM, etc.) sont vectoris\'es et index\'es par cat\'egorie.
+    \item \textbf{MySQL :} Base relationnelle pour la persistance de l'historique des conversations, des sessions et des d\'ecisions d'approbation.
+    \item \textbf{Flask / Socket.IO :} Backend web temps r\'eel. Socket.IO \'emet des \'ev\'enements (agent\_status, approval\_needed, discord\_sent) pour synchroniser l'\'etat du workflow avec le frontend.
+    \item \textbf{Discord Webhook :} Int\'egration pour envoyer automatiquement les builds approuv\'es vers un canal Discord d'\'equipe.
+    \item \textbf{Pandas :} M\'ecanisme de fallback d\'eterministe si l'API Groq est indisponible (Rate Limits).
 \end{itemize}
 
 \section{Architecture du Syst\`eme Multi-Agent}
@@ -137,13 +140,38 @@ Responsabilit\'es principales :
 \end{itemize}
 
 \subsection{Orchestration LangGraph}
-L'orchestrateur utilise un StateGraph avec \'etat typ\'e (BuilderState) \'etendu pour supporter :
-\begin{itemize}
-    \item Gestion des m\'etadonn\'ees d'approbation (approval\_request\_id, approval\_status)
-    \item Suivi des analyses de requirements (requirements\_analysis)
-    \item Persistance des composants s\'electionn\'es (selected\_components)
-    \item Int\'egration avec le syst\`eme de validation humaine
-\end{itemize}
+L'orchestrateur utilise un StateGraph avec \'etat typ\'e (BuilderState) \'etendu pour supporter la gestion des m\'etadonn\'ees, le suivi des analyses et la persistance des composants.
+
+\begin{lstlisting}[caption={D\'efinition du workflow LangGraph (graph.py)}]
+class BuilderState(TypedDict):
+    user_request: str
+    architect_plan: str
+    final_build_quote: str
+    selected_components: dict
+    total_price: int
+    human_approval: str
+    conversation_history: List[dict]
+
+# Construction du graphe sequentiel
+workflow = StateGraph(BuilderState)
+workflow.add_node("architect", architect_node)
+workflow.add_node("procurement", procurement_node)
+workflow.add_node("human_approval", human_approval_node)
+
+workflow.add_edge(START, "architect")
+workflow.add_edge("architect", "procurement")
+workflow.add_edge("procurement", "human_approval")
+workflow.add_edge("human_approval", END)
+
+# Compilation avec checkpoint et interruption
+memory = MemorySaver()
+agent_app = workflow.compile(
+    checkpointer=memory,
+    interrupt_before=["human_approval"]
+)
+\end{lstlisting}
+
+La m\'ethode de collaboration choisie est \textbf{s\'equentielle} : chaque agent d\'epend de la sortie du pr\'ec\'edent. Ce choix se justifie car la s\'election de composants n\'ecessite d'abord une analyse des besoins (Architecte), puis une recherche optimis\'ee (Procurement), et enfin une validation humaine avant toute action irr\'eversible (mise \`a jour du stock et notification Discord).
 
 \section{D\'efis Techniques et R\'esolution des Hallucinations}
 Le d\'eveloppement de ce syst\`eme nous a confront\'es \`a plusieurs d\'efis d'ing\'enierie inh\'erents aux LLMs.
@@ -215,6 +243,25 @@ Les tests A/B ont r\'ev\'el\'e des diff\'erences significatives entre les strat\
 \end{itemize}
 
 \section{Interface Utilisateur et Human-in-the-Loop}
+
+\subsection{Interface Wizard Interactive}
+L'interface utilisateur a \'et\'e con\c{c}ue comme un \textbf{wizard interactif} (et non un simple chatbot) compos\'e de cinq \'ecrans :
+
+\begin{enumerate}
+    \item \textbf{\'Ecran d'Accueil :} S\'election du cas d'usage (Gaming, IA/ML, Bureautique, D\'eveloppement, Cr\'eation de Contenu, G\'en\'eral) et configuration du budget via un slider interactif ou un champ de saisie directe (5\,000 -- 80\,000 MAD).
+    \item \textbf{\'Ecran de Construction IA :} Visualisation en temps r\'eel du pipeline multi-agent (Architecte $\rightarrow$ Procurement $\rightarrow$ Approbation) avec barres de progression anim\'ees.
+    \item \textbf{\'Ecran R\'ecapitulatif :} Affichage des 8 composants s\'electionn\'es par l'IA avec co\^ut total, pourcentage du budget utilis\'e, \'economies et statut de compatibilit\'e. Deux actions : \textit{Approuver et Envoyer \`a Discord} ou \textit{Modifier le Build}.
+    \item \textbf{\'Ecran de Modification :} Permet de cliquer sur n'importe quel composant pour afficher \textbf{3 alternatives au prix le plus proche}, tout en respectant les contraintes de compatibilit\'e (Socket CPU $\leftrightarrow$ Motherboard, DDR4/DDR5 $\leftrightarrow$ RAM).
+    \item \textbf{\'Ecran de R\'esultat :} Confirmation de l'approbation avec mise \`a jour de l'inventaire et notification Discord.
+\end{enumerate}
+
+\subsection{Int\'egration Discord et Gestion d'Inventaire}
+Lorsque l'utilisateur approuve un build :
+\begin{itemize}
+    \item Le stock de chaque composant s\'electionn\'e est d\'ecr\'ement\'e automatiquement dans les fichiers CSV via le module \texttt{inventory\_manager.py}.
+    \item Un message format\'e contenant le d\'etail complet du build est envoy\'e au canal Discord de l'\'equipe via un Webhook.
+    \item L'historique de la d\'ecision est persist\'e dans la base MySQL pour audit.
+\end{itemize}
 
 \subsection{Architecture Modulaire du Human-in-the-Loop}
 Le syst\`eme de validation humaine a \'et\'e enti\`erement refactoris\'e en une architecture modulaire comprenant trois composants principaux.
@@ -318,9 +365,13 @@ Le projet est organis\'e de mani\`ere modulaire :
     \item chroma\_db/ : Base vectorielle
 \end{itemize}
 
-\textbf{Dossier data/} : Bases de donn\'ees composants (CSV)
+\textbf{Dossier data/} : Bases de donn\'ees composants (8 fichiers CSV : cpus, gpus, motherboards, ram, storage, coolers, psus, cases)
 
-\textbf{Fichier app.py} : Interface principale Flask
+\textbf{Dossier database/} : Gestionnaire MySQL (db\_manager.py) pour la persistance
+
+\textbf{Fichier app.py} : Serveur Flask/Socket.IO avec APIs REST (/api/components/recommend, /api/components/alternatives) et handlers Socket.IO
+
+\textbf{Fichier inventory\_manager.py} : Gestion du stock (d\'ecr\'ementation automatique apr\`es approbation)
 
 \section{Conclusion et Perspectives}
 
@@ -331,16 +382,18 @@ Ce projet d\'emontre la puissance d'une architecture multi-agent modulaire et or
     \item \textbf{Orchestration Multi-Agent :} Architecture LangGraph avec agents sp\'ecialis\'es et modulaires
     \item \textbf{RAG Agentique :} Syst\`eme de r\'ecup\'eration augment\'ee avec base vectorielle ChromaDB
     \item \textbf{Human-in-the-Loop Avanc\'e :} Syst\`eme complet de validation avec interface modulaire
-    \item \textbf{Interface Web Fonctionnelle :} Application Flask avec chat temps r\'eel
+    \item \textbf{Interface Web Interactive :} Application Flask/Socket.IO avec wizard interactif, visualisation du pipeline multi-agent en temps r\'eel, et m\'ecanisme de modification avec alternatives
     \item \textbf{Evaluation des Prompts :} Framework complet avec tests A/B et optimisation
 \end{itemize}
 
 \subsection{Innovations Techniques}
 \begin{itemize}
-    \item \textbf{Architecture Modulaire :} S\'eparation claire des responsabilit\'es
+    \item \textbf{Architecture Modulaire :} S\'eparation claire des responsabilit\'es en modules ind\'ependants
     \item \textbf{Syst\`eme d'Approbation Sophistiqu\'e :} Gestion d'\'etat persistant et validation automatique
+    \item \textbf{Interface Wizard :} Exp\'erience utilisateur guid\'ee avec alternatives intelligentes (3 composants au prix le plus proche avec filtrage de compatibilit\'e)
     \item \textbf{Optimisation Bas\'ee sur les Donn\'ees :} Tests A/B avec am\'elioration de 41 pourcent
-    \item \textbf{Robustesse Op\'erationnelle :} M\'ecanismes de fallback et gestion d'erreurs
+    \item \textbf{Int\'egration Discord :} Notification automatique de l'\'equipe avec Webhook
+    \item \textbf{Robustesse Op\'erationnelle :} M\'ecanismes de fallback Pandas et gestion d'erreurs
 \end{itemize}
 
 \subsection{Impact Acad\'emique}

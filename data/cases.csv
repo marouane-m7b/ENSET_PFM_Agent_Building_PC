@@ -1,19 +1,19 @@
 Brand,Model,Form_Factor,Price_MAD,Availability,Stock
 Cooler Master,MasterBox Q300L,Micro-ATX,400,In Stock,5
-Phanteks,Eclipse P300A,ATX,500,In Stock,40
+Phanteks,Eclipse P300A,ATX,500,In Stock,39
 DeepCool,MATREXX 40,Micro-ATX,380,In Stock,20
 Montech,AIR 903 MAX,ATX,850,In Stock,31
 NZXT,H5 Flow,ATX,950,In Stock,48
 Corsair,4000D Airflow,ATX,1100,In Stock,11
 Lian Li,LANCOOL 216,ATX,1200,In Stock,13
-Fractal Design,Meshify C,ATX,1100,In Stock,43
+Fractal Design,Meshify C,ATX,1100,In Stock,42
 Be Quiet!,Pure Base 500DX,ATX,1400,In Stock,34
 Cooler Master,HAF 500,ATX,1200,In Stock,43
 Phanteks,Eclipse P500A,ATX,1800,In Stock,36
 NZXT,H7 Flow,ATX,1700,In Stock,35
 Fractal Design,Define 7,ATX,2000,In Stock,13
-Lian Li,O11 Dynamic EVO,ATX,1800,In Stock,16
-Fractal Design,North,ATX,1700,Limited Stock,41
+Lian Li,O11 Dynamic EVO,ATX,1800,In Stock,15
+Fractal Design,North,ATX,1700,Limited Stock,39
 Corsair,5000D Airflow,ATX,1800,In Stock,28
 Lian Li,O11 Dynamic XL,E-ATX,2500,In Stock,14
 Phanteks,Enthoo Pro 2,E-ATX,2800,Limited Stock,8
@@ -23,6 +23,6 @@ Fractal Design,Torrent,ATX,2200,In Stock,38
 Lian Li,LANCOOL III,ATX,1900,In Stock,9
 NZXT,H9 Flow,ATX,2400,In Stock,26
 NZXT,H1,ITX,2000,In Stock,47
-Lian Li,A4-H2O,ITX,1600,In Stock,48
+Lian Li,A4-H2O,ITX,1600,In Stock,47
 Cooler Master,NR200P,ITX,900,In Stock,5
 Fractal Design,Terra,ITX,1800,Limited Stock,6
