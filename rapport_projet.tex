@@ -8,8 +8,13 @@
 \usepackage{xcolor}
 \usepackage{listings}
 \usepackage{titlesec}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning}
+\usepackage{booktabs}
 
 \geometry{top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm}
+\graphicspath{{screenshots/}}
 
 \lstset{
     language=Python,
@@ -98,7 +103,40 @@ Le code source de notre projet a \'et\'e structur\'e de mani\`ere modulaire auto
 \end{itemize}
 
 \section{Architecture du Syst\`eme Multi-Agent}
-Dans le cadre de ce projet, nous avons d\'evelopp\'e un \'ecosyst\`eme intelligent capable de concevoir un ordinateur optimis\'e selon un budget pr\'ecis. Le flux de travail a \'et\'e d\'ecompos\'e hi\'erarchiquement avec une architecture modulaire avanc\'ee.
+Dans le cadre de ce projet, nous avons d\'evelopp\'e un \'ecosyst\`eme intelligent capable de concevoir un ordinateur optimis\'e selon un budget pr\'ecis. Le flux de travail a \'et\'e d\'ecompos\'e s\'equentiellement avec une architecture modulaire avanc\'ee.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=1.8cm, auto,
+    block/.style={rectangle, draw=blue!60, fill=blue!8, text width=2.8cm, text centered, rounded corners, minimum height=1.2cm, font=\small\bfseries},
+    decision/.style={diamond, draw=orange!60, fill=orange!8, text width=1.6cm, text centered, aspect=2, font=\small\bfseries},
+    io/.style={trapezium, draw=green!60, fill=green!8, trapezium left angle=70, trapezium right angle=110, text width=2cm, text centered, minimum height=1cm, font=\small\bfseries},
+    arrow/.style={-Stealth, thick, draw=gray!70}]
+
+    \node[io] (user) {Utilisateur};
+    \node[block, right=of user] (arch) {Agent Architecte};
+    \node[block, right=of arch] (proc) {Agent Procurement};
+    \node[decision, below=1.5cm of proc] (hitl) {Approbation Humaine};
+    \node[block, left=of hitl] (modify) {Modifier Build (3 Alternatives)};
+    \node[io, below=1.5cm of hitl] (out) {Discord + Inventaire};
+
+    \node[block, above=0.8cm of arch, fill=purple!8, draw=purple!60, text width=2.5cm] (rag) {RAG (ChromaDB)};
+    \node[block, above=0.8cm of proc, fill=red!8, draw=red!60, text width=2.5cm] (llm) {Groq LLM};
+
+    \draw[arrow] (user) -- node[above, font=\tiny]{Budget + Use Case} (arch);
+    \draw[arrow] (arch) -- node[above, font=\tiny]{Requirements} (proc);
+    \draw[arrow] (proc) -- node[right, font=\tiny]{Build} (hitl);
+    \draw[arrow] (hitl) -- node[below, font=\tiny]{Rejet} (modify);
+    \draw[arrow] (modify) |- node[near start, above, font=\tiny]{Swap} (proc);
+    \draw[arrow] (hitl) -- node[right, font=\tiny]{Approuv\'e} (out);
+    \draw[arrow, dashed] (rag) -- (arch);
+    \draw[arrow, dashed] (rag) -- (proc);
+    \draw[arrow, dashed] (llm) -- (arch);
+    \draw[arrow, dashed] (llm) -- (proc);
+\end{tikzpicture}
+\caption{Architecture globale du syst\`eme multi-agent}
+\label{fig:architecture}
+\end{figure}
 
 \subsection{Architecture Modulaire}
 Le syst\`eme a \'et\'e structur\'e en modules ind\'ependants pour am\'eliorer la lisibilit\'e, la maintenabilit\'e et la r\'eutilisabilit\'e :
@@ -224,23 +262,7 @@ Le syst\`eme \'evalue cinq dimensions critiques :
 \end{itemize}
 
 \subsection{R\'esultats de l'Optimisation}
-Les tests A/B ont r\'ev\'el\'e des diff\'erences significatives entre les strat\'egies :
-
-\subsubsection{Classement des Performances}
-\begin{enumerate}
-    \item \textbf{Strategy D (Context-Aware) :} Score 0.765 - Meilleure performance globale
-    \item \textbf{Strategy C (Structured) :} Score 0.764 - Excellente pr\'ecision (0.800)
-    \item \textbf{Strategy B (Detailed) :} Score 0.674 - Bon compromis performance/temps
-    \item \textbf{Strategy A (Basic) :} Score 0.542 - Baseline de r\'ef\'erence
-\end{enumerate}
-
-\subsubsection{Gains de Performance}
-\begin{itemize}
-    \item \textbf{Am\'elioration maximale :} 41 pourcent entre la meilleure et la pire strat\'egie
-    \item \textbf{Temps de r\'eponse optimal :} Strategy A (1.75s) vs Strategy C (1.80s)
-    \item \textbf{Pr\'ecision maximale :} Strategy C avec 80 pourcent de pr\'ecision d'extraction
-    \item \textbf{Robustesse :} Strategy D excellente sur tous les sc\'enarios de complexit\'e
-\end{itemize}
+Les tests A/B ont montr\'e que la strat\'egie \textbf{Context-Aware} (D) offre les meilleurs r\'esultats avec un score global de 0.765, soit une am\'elioration de 41\% par rapport \`a la strat\'egie de base. C'est cette strat\'egie qui a \'et\'e retenue en production.
 
 \section{Interface Utilisateur et Human-in-the-Loop}
 
@@ -254,6 +276,55 @@ L'interface utilisateur a \'et\'e con\c{c}ue comme un \textbf{wizard interactif}
     \item \textbf{\'Ecran de Modification :} Permet de cliquer sur n'importe quel composant pour afficher \textbf{3 alternatives au prix le plus proche}, tout en respectant les contraintes de compatibilit\'e (Socket CPU $\leftrightarrow$ Motherboard, DDR4/DDR5 $\leftrightarrow$ RAM).
     \item \textbf{\'Ecran de R\'esultat :} Confirmation de l'approbation avec mise \`a jour de l'inventaire et notification Discord.
 \end{enumerate}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{welcome.png}
+\caption{\'Ecran d'accueil : s\'election du cas d'usage parmi 6 cat\'egories}
+\label{fig:welcome}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{budget.png}
+\caption{Configuration du budget via slider interactif ou saisie directe, avec s\'election du niveau de performance}
+\label{fig:budget}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{building.png}
+\caption{\'Ecran de construction IA : visualisation en temps r\'eel du pipeline multi-agent}
+\label{fig:building}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{summary.png}
+\caption{\'Ecran r\'ecapitulatif : 8 composants s\'electionn\'es par l'IA avec co\^ut total et actions Approuver/Modifier}
+\label{fig:summary}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{modify.png}
+\caption{\'Ecran de modification : chaque composant propose 3 alternatives compatibles au prix le plus proche}
+\label{fig:modify}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{result.png}
+\caption{\'Ecran de confirmation : build approuv\'e, inventaire mis \`a jour et notification Discord envoy\'ee}
+\label{fig:result}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{discord.png}
+\caption{Notification Discord : message automatique envoy\'e au canal d'\'equipe avec le d\'etail complet du build approuv\'e}
+\label{fig:discord}
+\end{figure}
 
 \subsection{Int\'egration Discord et Gestion d'Inventaire}
 Lorsque l'utilisateur approuve un build :
